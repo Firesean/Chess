@@ -29,7 +29,7 @@ class Pawn(Piece):
     # Takes pieces diagonally
     # Moves forward once
     # En Passant after a pawn uses a double move you can capture by going behind it
-    # Pawn Promotion - If a pawn reaches the opponents edge it can be promoted to any piece aside
+    # Pawn Promotion - If a pawn reaches the opponents edge MUST be promoted to any piece aside
     # from a King
 
     def move_piece(self, x, y):
