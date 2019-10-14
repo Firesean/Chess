@@ -1,11 +1,11 @@
 class Piece:
     pieces = ["Pawn", "Knight", "Bishop", "Rook", "Queen", "King"]
 
-    def __init__(self, row, col, pieceType): # Position = Row 1-8 (A - G) Col 1-8
+    def __init__(self, row, col, piece_type):  # Position = Row 1-8 (A - G) Col 1-8
         self.row = row
         self.col = col
         self.patterns = ["<", "^", ">", "V"]
-        self.pieceType = pieceType
+        self.pieceType = piece_type
 
     def get_row(self):
         return self.row
@@ -29,7 +29,7 @@ class Pawn(Piece):
     # Takes pieces diagonally
     # Moves forward once
     # En Passant after a pawn uses a double move you can capture by going behind it
-    # Pawn Promotion - If a pawn reaches the opponents edge it can be promoted to any piece aside
+    # Pawn Promotion - If a pawn reaches the opponents edge MUST be promoted to any piece aside
     # from a King
 
     def move_piece(self, x, y):
