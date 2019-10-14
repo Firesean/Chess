@@ -1,11 +1,11 @@
 class Piece:
     pieces = ["Pawn", "Knight", "Bishop", "Rook", "Queen", "King"]
 
-    def __init__(self, row, col, pieceType): # Position = Row 1-8 (A - G) Col 1-8
+    def __init__(self, row, col, piece_type):  # Position = Row 1-8 (A - G) Col 1-8
         self.row = row
         self.col = col
         self.patterns = ["<", "^", ">", "V"]
-        self.pieceType = pieceType
+        self.pieceType = piece_type
 
     def get_row(self):
         return self.row
@@ -69,6 +69,9 @@ class King(Piece):
 
     def has_moved(self):
         return self.moved
+
+    def get_in_check(self):
+        return self.inCheck
 
     # Moves any direction by one square
     # If King hasn't been in check and moved it can do a movement to left or right by 2 squares
