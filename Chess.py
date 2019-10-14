@@ -34,12 +34,7 @@ class Chess:
             self.board[row] *= self.board_size
 
     def set_up_board(self):
-        for side in [-1, 1]:
-            start = self.board_size-2
-            end = self.board_size
-            if side == -1:
-                start = 1
-                end = start - 2
+        for start, end, side in [[1, -1, -1], [self.board_size-2, self.board_size, 1]]:  # Direction of placing pieces
             for row in range(start, end, side):
                 for col in range(self.board_size):
                     if row == start:
