@@ -34,7 +34,7 @@ class Chess:
             self.board[row] *= self.board_size
 
     def set_up_board(self):
-        for side in [-1, 1]:
+        for side in [-1, 1]:  # Direction of placing pieces
             start = self.board_size-2
             end = self.board_size
             if side == -1:
