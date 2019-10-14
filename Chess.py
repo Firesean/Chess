@@ -34,7 +34,7 @@ class Chess:
             self.board[row] *= self.board_size
 
     def set_up_board(self):
-        for row in range(6, self.board_size): # 6,8, 1 and 1,0, -1
+        for row in range(6, self.board_size):  # 6,8, 1 and 1,0, -1
             for col in range(self.board_size):
                 if row == 6:
                     self.board[row][col] = self.default_board_state[col]
