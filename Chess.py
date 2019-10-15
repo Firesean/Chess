@@ -1,15 +1,15 @@
 # import Players
 
 from Pieces import *
-
+# https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
 
 class Chess:
     default_board_size = 8
-    default_board_state = ([Pawn(0,0, Piece.pieces[0])]*default_board_size)+\
-                          [Rook(0,0, Piece.pieces[3]), Knight(0,0,Piece.pieces[1]),
-                           Bishop(0,0, Piece.pieces[2]),Queen(0,0, Piece.pieces[4]),
-                           King(0,0, Piece.pieces[5]), Bishop(0,0, Piece.pieces[2]),
-                           Knight(0,0, Piece.pieces[1]), Rook(0,0,Piece.pieces[3])]
+    default_board_state = ([Pawn(0, 0, Piece.piece_types[0])] * default_board_size) + \
+                          [Rook(0, 0, Piece.piece_types[3]), Knight(0, 0, Piece.piece_types[1]),
+                           Bishop(0, 0, Piece.piece_types[2]), Queen(0, 0, Piece.piece_types[4]),
+                           King(0, 0, Piece.piece_types[5]), Bishop(0, 0, Piece.piece_types[2]),
+                           Knight(0, 0, Piece.piece_types[1]), Rook(0, 0, Piece.piece_types[3])]
 
     def __init__(self, board_size=default_board_size):
         # Declarations
@@ -22,9 +22,9 @@ class Chess:
         for row in self.board:
             for piece in row:
                 if piece is None:
-                    print(None, end=" ")
+                    print(u"\u0011", end=" ")
                     continue
-                print(piece.get_piece_type(), end=" ")
+                print(Piece.pieces[piece.get_color()+" "+piece.get_piece_type()], end=" ")
             print("\n")
 
     def create_board(self):
@@ -34,21 +34,15 @@ class Chess:
             self.board[row] *= self.board_size
 
     def set_up_board(self):
-        for side in [-1, 1]:  # Direction of placing pieces
-            start = self.board_size-2
-            end = self.board_size
-            if side == -1:
-                start = 1
-                end = start - 2
+        for start, end, side, color in [[1, -1, -1, "White"], [self.board_size-2, self.board_size, 1, "Black"]]:
+            # Start row to End row by side then color is assigned
             for row in range(start, end, side):
                 for col in range(self.board_size):
                     if row == start:
                         self.board[row][col] = self.default_board_state[col]  # Sets pawns
                     else:
                         self.board[row][col] = self.default_board_state[col+self.board_size]  # Sets piece order
-
-    # def canMove(self, piece , x , y):
-    #     movePattern = piece.movePattern()
+                    self.board[row][col].add_color(color)
 
     def get_space(self, x, y):
         return self.board[x][y]
