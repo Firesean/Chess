@@ -5,11 +5,11 @@ class Piece:
               "Black Pawn": u"\u2659", "Black Knight": u"\u2658", "Black Bishop": u"\u2657",
               "Black Rook": u"\u2656", "Black Queen": u"\u2655", "Black King": u"\u2654"}
 
-    def __init__(self, row, col, piece_type):  # Position = Row 1-8 (A - G) Col 1-8
+    def __init__(self, row=0, col=0):  # Position = Row 1-8 (A - G) Col 1-8
         self.row = row
         self.col = col
         self.patterns = ["<", "^", ">", "V"]
-        self.pieceType = piece_type
+        self.pieceType = type(self).__name__
         self.color = None
 
     def get_row(self):
@@ -21,12 +21,14 @@ class Piece:
     def get_piece_type(self):
         return self.pieceType
 
-    def add_color(self, color):
+    def set_color(self, color):
         self.color = color
 
     def get_color(self):
         return self.color
 
+    def get_image(self):
+        return self.color + " " + self.pieceType
 
 class Pawn(Piece):
     onBench = True
@@ -93,4 +95,3 @@ class King(Piece):
     # Players can not intentionally move the King into check as it is an Illegal move
 
 
-pawn = Pawn(5, 1, Piece.piece_types[0])
