@@ -62,6 +62,9 @@ class Chess:
                         self.board[row][col] = new_piece  # Sets pieces by positioning in board state
                     self.board[row][col].set_color(color)
 
+    def get_board_size(self):
+        return self.board_size
+
     def get_space(self, x, y):
         '''
         :param x:

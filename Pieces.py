@@ -37,6 +37,9 @@ class Piece:
         '''
         return self.col
 
+    def get_pos(self):
+        return self.row, self.col
+
     def get_piece_type(self):
         '''
         :return: self.pieceType
@@ -121,7 +124,6 @@ class Rook(Piece):
     King moves over 2 spaces with the Rook placed behind the King's path
     '''
     moved = False
-    pass
     # Value : 5
     # Moves in straight lines (No diagonals) as far as possible
     # Castling if it hasn't moved from originally position
@@ -146,7 +148,6 @@ class King(Piece):
     Check : In threat of being taken, Must be saved
     Checkmate : No moves can be made to save
     '''
-    pass
     # Value : inf
     inCheck = False
     moved = False
