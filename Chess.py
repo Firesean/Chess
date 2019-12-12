@@ -26,12 +26,26 @@ class Chess:
         self.board = []
         self.players = []
         # Main
-        self.create_board()
+        self.new_board()
         self.set_pieces()
-        self.show_board()
+        self.print_board()
         self.selected_piece = None
 
-    def create_board(self):
+    def get_board_size(self):
+        '''
+        :return: Size of board
+        '''
+        return self.board_size
+
+    def get_space(self, x, y):
+        '''
+        :param x:
+        :param y:
+        :return: Position on board, Piece Class or None
+        '''
+        return self.board[x][y]
+
+    def new_board(self):
         '''
         :return: None
         Sets board to empty to then continue to generate a new board
@@ -40,6 +54,20 @@ class Chess:
         for row in range(self.board_size):
             self.board.append([None])
             self.board[row] *= self.board_size
+
+    def print_board(self):
+        '''
+        :return: None
+        For Debugging usages / Testing
+        Displays a console prompt board state
+        '''
+        for row in self.board:
+            for piece in row:
+                if not piece:
+                    print(u"\u0011", end=" ")
+                    continue
+                print(Piece.pieces[piece.get_image_path()], end=" ")
+            print("\n")
 
     def set_pieces(self):
         '''
@@ -61,56 +89,6 @@ class Chess:
 
                         self.board[row][col] = new_piece  # Sets pieces by positioning in board state
                     self.board[row][col].set_color(color)
-
-    def get_board_size(self):
-        return self.board_size
-
-    def get_space(self, x, y):
-        '''
-        :param x:
-        :param y:
-        :return: Position on board, Piece Class or None
-        '''
-        return self.board[x][y]
-
-    def show_board(self):
-        '''
-        :return: None
-        For Debugging usages / Testing
-        Displays a console prompt board state
-        '''
-        for row in self.board:
-            for piece in row:
-                if not piece:
-                    print(u"\u0011", end=" ")
-                    continue
-                print(Piece.pieces[piece.get_image_path()], end=" ")
-            print("\n")
-
-    def select_piece(self, row, col):
-        '''
-        :param row:
-        :param col:
-        :return: None
-        Selects an object on the board if any
-        '''
-        self.selected_piece = self.get_space(row, col)
-
-    def movable_position(self, piece, row, col):
-        '''
-        :param piece:
-        :param row:
-        :param col:
-        :return: Boolean
-        Returns if object is in the position of new position of piece
-        '''
-        if self.board[row][col]:
-            return False
-        return True
-
-    def move_piece(self, row, col):
-        if self.movable_position(self.selected_piece, row, col):
-            self.selected_piece.move(row, col)
 
 
 Chess()

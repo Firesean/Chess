@@ -19,17 +19,13 @@ class Piece:
         color is set within program,
         pattern is a list containing possible movement types
         '''
-        self.row = row
         self.col = col
-        self.pieceType = type(self).__name__
         self.color = None
-        self.pattern = []
+        self.patterns = []
+        self.pieceType = type(self).__name__
+        self.row = row
+        self.value = 0
 
-    def get_row(self):
-        '''
-        :return: self.row
-        '''
-        return self.row
 
     def get_col(self):
         '''
@@ -37,14 +33,39 @@ class Piece:
         '''
         return self.col
 
-    def get_pos(self):
-        return self.row, self.col
+    def get_color(self):
+        '''
+        :return: self.color
+        '''
+        return self.color
 
     def get_piece_type(self):
         '''
         :return: self.pieceType
         '''
         return self.pieceType
+
+    def get_pos(self):
+        return self.row, self.col
+
+    def get_row(self):
+        '''
+        :return: self.row
+        '''
+        return self.row
+
+    def get_value(self):
+        '''
+        :return: Value
+        '''
+        return self.value
+
+    def get_image_path(self):
+        '''
+        :return: Dictionary Key for unicode
+        Using the color and pieceType class name
+        '''
+        return self.color + " " + self.pieceType
 
     def set_color(self, color):
         '''
@@ -53,19 +74,6 @@ class Piece:
         Sets piece color
         '''
         self.color = color
-
-    def get_color(self):
-        '''
-        :return: self.color
-        '''
-        return self.color
-
-    def get_image_path(self):
-        '''
-        :return: Dictionary Key for unicode
-        Using the color and pieceType class name
-        '''
-        return self.color + " " + self.pieceType
 
 
 class Pawn(Piece):
@@ -80,15 +88,26 @@ class Pawn(Piece):
     onBench = True
 
     def at_bench(self):
+        '''
+        Checks to see if moved
+        :return: Bool
+        '''
         return self.onBench
+
+    def move(self, x, y):
+        '''
+        :param x:
+        :param y:
+        Eventually moves itself
+        :return: None
+        '''
+        self.col += y
+        self.row += x
+        self.onBench = False
 
     def move_pattern(self):
         pass
 
-    def move(self, x, y):
-        self.row += x
-        self.col += y
-        self.onBench = False
 
 
 class Bishop(Piece):
@@ -152,11 +171,17 @@ class King(Piece):
     inCheck = False
     moved = False
 
-    def has_moved(self):
-        return self.moved
-
     def get_in_check(self):
+        '''
+        :return: inCheck
+        '''
         return self.inCheck
+
+    def has_moved(self):
+        '''
+        :return: Moved
+        '''
+        return self.moved
 
     # Moves any direction by one square
     # If King hasn't been in check and moved it can do a movement to left or right by 2 squares
