@@ -11,9 +11,11 @@ class Interface:
         self.canvas = None
         self.reference = []
         self.game = game
+        self.icon_ref = "chessPicture.ICO"
         self.window_size = window_size  # (X, Y)
 
         # Main
+        self.root.iconbitmap(self.icon_ref)
         self.draw_board(self.game, self.window_size)
         self.root.title(type(game).__name__)
         self.root.mainloop()
