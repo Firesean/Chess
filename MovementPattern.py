@@ -8,6 +8,11 @@ class MovementType(Enum):
 
 
 class MovementPattern:
+    '''
+    :param piece:
+    :param board:
+    :return: Possible Movements
+    '''
     # Range between numbers,
     # Set no matter what it has to move a certain amount,
     # conditional like castling and En Passant
@@ -22,6 +27,11 @@ class MovementPattern:
 class Diagonal(MovementPattern):
 
     def return_positions(self, piece, board):
+        '''
+        :param piece:
+        :param board:
+        :return: Possible Movements
+        '''
         move_able = []
         # cur_pos = (X,Y)
         # Fix algorithm to check from piece instead of through the piece
@@ -39,7 +49,11 @@ class Diagonal(MovementPattern):
 
 
 class Horizontal(MovementPattern):
-
+    '''
+    :param piece:
+    :param board:
+    :return: Possible Movements
+    '''
     def return_positions(self, piece, board):
         move_able = []
         board = board.board
@@ -56,7 +70,11 @@ class Horizontal(MovementPattern):
 
 
 class LJump(MovementPattern):
-
+    '''
+    :param piece:
+    :param board:
+    :return: Possible Movements
+    '''
     def return_positions(self, piece, board):
         moves = [(1, 3), (3, 1), (-1, 3), (3, -1), (1, -3), (-3, 1), (-3, -1), (-1, -3)]
         move_able = []
@@ -72,7 +90,11 @@ class LJump(MovementPattern):
 
 
 class Vertical(MovementPattern):
-
+    '''
+    :param piece:
+    :param board:
+    :return: Possible Movements
+    '''
     def return_positions(self, piece, board):
         move_able = []
         # cur_pos = (X,Y)

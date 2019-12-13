@@ -31,6 +31,12 @@ class Chess:
         self.print_board()
         self.selected_piece = None
 
+    def get_board(self):
+        '''
+        :return: Board
+        '''
+        return self.board
+
     def get_board_size(self):
         '''
         :return: Size of board
@@ -75,9 +81,9 @@ class Chess:
         Creates new pieces and sets colors/position for piece
         '''
         for start, end, side, color in [[1, -1, -1, self.default_colors[0]],
-                                        [self.board_size-2, self.board_size, 1, self.default_colors[1]]]:
-            for row in range(start, end, side):
-                for col in range(self.board_size):
+                                        [self.board_size-2, self.board_size, 1, self.default_colors[1]]]:  # 2 Iterations O(2^1)
+            for row in range(start, end, side):  # 2 Rows Iterations O(4^2)
+                for col in range(self.board_size):  # Col Iterations O(4*N^3) O("32"^3)
                     piece = self.default_board_state[col + 1].get_piece_type()
                     if row == start:
                         piece = self.default_board_state[0].get_piece_type()
@@ -89,7 +95,4 @@ class Chess:
 
                         self.board[row][col] = new_piece  # Sets pieces by positioning in board state
                     self.board[row][col].set_color(color)
-
-
-Chess()
 
