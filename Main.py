@@ -1,4 +1,4 @@
 import Chess as chs
-import Interface as inter
+import Interface as ui
 
-game = inter.Interface(chs.Chess(), 800)
+game = ui.Interface(chs.Chess(), 800)

@@ -39,6 +39,19 @@ class Piece:
         '''
         return self.color
 
+    def get_image(self):
+        '''
+        :return: Unicode Image
+        '''
+        return self.pieces[self.get_image_path()]
+
+    def get_image_path(self):
+        '''
+        :return: Dictionary Key for unicode
+        Using the color and pieceType class name
+        '''
+        return self.color + " " + self.pieceType
+
     def get_piece_type(self):
         '''
         :return: self.pieceType
@@ -46,6 +59,9 @@ class Piece:
         return self.pieceType
 
     def get_pos(self):
+        '''
+        :return: Row, Col
+        '''
         return self.row, self.col
 
     def get_row(self):
@@ -59,13 +75,6 @@ class Piece:
         :return: Value
         '''
         return self.value
-
-    def get_image_path(self):
-        '''
-        :return: Dictionary Key for unicode
-        Using the color and pieceType class name
-        '''
-        return self.color + " " + self.pieceType
 
     def set_color(self, color):
         '''
