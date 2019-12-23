@@ -28,7 +28,6 @@ class Chess:
         # Main
         self.new_board()
         self.set_pieces()
-        self.print_board()
         self.selected_piece = None
 
     def get_board(self):
@@ -43,13 +42,13 @@ class Chess:
         '''
         return self.board_size
 
-    def get_space(self, x, y):
+    def get_space(self, row, col):
         '''
-        :param x:
-        :param y:
+        :param row:
+        :param col:
         :return: Position on board, Piece Class or None
         '''
-        return self.board[x][y]
+        return self.board[row][col]
 
     def new_board(self):
         '''
@@ -94,5 +93,5 @@ class Chess:
                     else:
 
                         self.board[row][col] = new_piece  # Sets pieces by positioning in board state
-                    self.board[row][col].set_color(color)
+                    self.get_space(row, col).set_color(color)
 
