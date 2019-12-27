@@ -1,5 +1,5 @@
 # import Players
-
+import time
 from Pieces import *
 # https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
 
@@ -9,20 +9,19 @@ class Chess:
     Chess game, Two Colors and Players, Default information such as Piece Positioning, Board size and color are located here.
     '''
     default_colors = ["White", "Black"]
-    default_board_size = 8
+    board_size = 8
     default_board_state = ([Pawn(Piece.piece_types[0])] + \
                           [Rook(Piece.piece_types[3]), Knight(Piece.piece_types[1]),
                            Bishop(Piece.piece_types[2]), Queen(Piece.piece_types[4]),
                            King(Piece.piece_types[5]), Bishop(Piece.piece_types[2]),
                            Knight(Piece.piece_types[1]), Rook(Piece.piece_types[3])])
 
-    def __init__(self, board_size=default_board_size):
+    def __init__(self):
         '''
         :param board_size:
         Generates the full game
         '''
         # Declarations
-        self.board_size = board_size
         self.board = []
         self.players = []
         # Main
@@ -48,7 +47,10 @@ class Chess:
         :param col:
         :return: Position on board, Piece Class or None
         '''
-        return self.board[row][col]
+        try:
+            return self.board[col][row]
+        except IndexError:
+            return None
 
     def new_board(self):
         '''
@@ -79,6 +81,7 @@ class Chess:
         :return: None
         Creates new pieces and sets colors/position for piece
         '''
+        _time = time.time()
         for start, end, side, color in [[1, -1, -1, self.default_colors[0]],
                                         [self.board_size-2, self.board_size, 1, self.default_colors[1]]]:  # 2 Iterations O(2^1)
             for row in range(start, end, side):  # 2 Rows Iterations O(4^2)
@@ -93,5 +96,6 @@ class Chess:
                     else:
 
                         self.board[row][col] = new_piece  # Sets pieces by positioning in board state
-                    self.get_space(row, col).set_color(color)
+                    self.get_space(col, row).set_color(color)
+        print(time.time()-_time)
 

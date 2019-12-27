@@ -21,11 +21,11 @@ class Piece:
         '''
         self.col = col
         self.color = None
+        self.interface_ref = None
         self.patterns = []
         self.pieceType = type(self).__name__
         self.row = row
         self.value = 0
-
 
     def get_col(self):
         '''
@@ -51,6 +51,12 @@ class Piece:
         Using the color and pieceType class name
         '''
         return self.color + " " + self.pieceType
+
+    def get_interface_ref(self):
+        '''
+        :return: self.interface_ref
+        '''
+        return self.interface_ref
 
     def get_piece_type(self):
         '''
@@ -83,6 +89,14 @@ class Piece:
         Sets piece color
         '''
         self.color = color
+
+    def set_interface_ref(self, ref):
+        '''
+        :param ref:
+        :return: None
+        Sets reference to interface for easy adjustments
+        '''
+        self.interface_ref = ref
 
 
 class Pawn(Piece):

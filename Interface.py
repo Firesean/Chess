@@ -12,12 +12,14 @@ class Interface:
         self.reference = []
         self.game = game
         self.icon_ref = "chessPicture.ICO"
+        self.selected = None
         self.window_size = window_size  # (X, Y)
 
         # Main
         self.root.iconbitmap(self.icon_ref)
         self.draw_board()
         self.draw_pieces()
+        self.set_binds()
         self.root.title(type(game).__name__)
         self.root.mainloop()
 
@@ -28,6 +30,12 @@ class Interface:
     @staticmethod
     def calculate_xy(index, spacer, offset):
         return index * spacer + offset
+
+    def controller(self, event):
+        if self.selected:
+            self.move_piece(event)
+        else:
+            self.select_piece(event)
 
     def draw_board(self):
         '''
@@ -55,7 +63,6 @@ class Interface:
         Adds pieces to reference to later move pieces on the interface
         :return: None
         '''
-
         board = self.game.get_board()
         spacer = self.get_spacer()
         offset = self.get_offset()
@@ -68,6 +75,7 @@ class Interface:
                                                                   self.calculate_xy(col_index, spacer, offset),
                                                                   text=piece.get_image(),
                                                                   font="TimesNewRoman {}".format(offset)))
+                    piece.set_interface_ref(self.reference[len(self.reference)-1])
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
@@ -85,8 +93,21 @@ class Interface:
         offset = self.get_offset()
         return self.calculate_xy(row, spacer, offset), self.calculate_xy(col, spacer, offset)
 
+    def move_piece(self, event=None):
+        if self.selected:
+            self.canvas.coords(self.selected.get_interface_ref(), event.x, event.y)
+            self.selected = None
+
     def select_piece(self, event=None):
-        pass
+        if event:
+            x, y = event.x, event.y
+            row, col = self.get_row_col_with_xy(x+self.get_offset(), y+self.get_offset())
+            self.selected = self.game.get_space(row, col)
+            # self.reveal_movable(self.selected)
+
+    def set_binds(self):
+        self.root.bind("<Button-1>", lambda event: self.controller(event))
+
 
 
 
