@@ -1,5 +1,4 @@
 # import Players
-import time
 from Pieces import *
 # https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
 
@@ -10,11 +9,10 @@ class Chess:
     '''
     default_colors = ["White", "Black"]
     board_size = 8
-    default_board_state = ([Pawn(Piece.piece_types[0])] + \
-                          [Rook(Piece.piece_types[3]), Knight(Piece.piece_types[1]),
-                           Bishop(Piece.piece_types[2]), Queen(Piece.piece_types[4]),
-                           King(Piece.piece_types[5]), Bishop(Piece.piece_types[2]),
-                           Knight(Piece.piece_types[1]), Rook(Piece.piece_types[3])])
+    default_board_state = ([Pawn().get_class_name()] + [Rook().get_class_name(), Knight().get_class_name(),
+                           Bishop().get_class_name(), Queen().get_class_name(),
+                           King().get_class_name(), Bishop().get_class_name(),
+                           Knight().get_class_name(), Rook().get_class_name()])
 
     def __init__(self):
         '''
@@ -41,7 +39,12 @@ class Chess:
         '''
         return self.board_size
 
-    def get_space(self, row, col):
+    def get_piece_pos(self, piece):
+        for i in range(len(self.board)):
+            if piece in self.board[i]:
+                return self.board[i].index(piece), i
+
+    def get_space(self, col, row):
         '''
         :param row:
         :param col:
@@ -51,6 +54,9 @@ class Chess:
             return self.board[col][row]
         except IndexError:
             return None
+
+    def move_piece(self, piece, row, col):
+        self.board[col][row] = piece
 
     def new_board(self):
         '''
@@ -81,21 +87,15 @@ class Chess:
         :return: None
         Creates new pieces and sets colors/position for piece
         '''
-        _time = time.time()
         for start, end, side, color in [[1, -1, -1, self.default_colors[0]],
                                         [self.board_size-2, self.board_size, 1, self.default_colors[1]]]:  # 2 Iterations O(2^1)
             for row in range(start, end, side):  # 2 Rows Iterations O(4^2)
                 for col in range(self.board_size):  # Col Iterations O(4*N^3) O("32"^3)
-                    piece = self.default_board_state[col + 1].get_piece_type()
+                    piece = self.default_board_state[col + 1]
                     if row == start:
-                        piece = self.default_board_state[0].get_piece_type()
-                    new_piece = eval("{0}({1},{2})".format(piece, row, col))
-                    if row == start:
-
-                        self.board[row][col] = new_piece  # Sets pawns
-                    else:
-
-                        self.board[row][col] = new_piece  # Sets pieces by positioning in board state
+                        piece = self.default_board_state[0]
+                    new_piece = eval("{0}()".format(piece))
+                    self.board[col][row] = new_piece
                     self.get_space(col, row).set_color(color)
-        print(time.time()-_time)
+
 

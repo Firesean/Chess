@@ -10,34 +10,29 @@ class Piece:
               "Black Pawn": u"\u2659", "Black Knight": u"\u2658", "Black Bishop": u"\u2657",
               "Black Rook": u"\u2656", "Black Queen": u"\u2655", "Black King": u"\u2654"}
 
-    def __init__(self, row=0, col=0):  # Position = Row 1-8 (A - G) Col 1-8
+    def __init__(self):  # Position = Row 1-8 (A - G) Col 1-8
         '''
-        :param row:
-        :param col:
         Generates Piece Class based on subclass,
         pieceType is the name of current class,
         color is set within program,
         pattern is a list containing possible movement types
         '''
-        self.col = col
         self.color = None
         self.interface_ref = None
         self.patterns = []
-        self.pieceType = type(self).__name__
-        self.row = row
         self.value = 0
-
-    def get_col(self):
-        '''
-        :return: self.col
-        '''
-        return self.col
 
     def get_color(self):
         '''
         :return: self.color
         '''
         return self.color
+
+    def get_class_name(self):
+        '''
+        :return: class name
+        '''
+        return type(self).__name__
 
     def get_image(self):
         '''
@@ -50,7 +45,7 @@ class Piece:
         :return: Dictionary Key for unicode
         Using the color and pieceType class name
         '''
-        return self.color + " " + self.pieceType
+        return self.color + " " + self.get_piece_type()
 
     def get_interface_ref(self):
         '''
@@ -62,19 +57,7 @@ class Piece:
         '''
         :return: self.pieceType
         '''
-        return self.pieceType
-
-    def get_pos(self):
-        '''
-        :return: Row, Col
-        '''
-        return self.row, self.col
-
-    def get_row(self):
-        '''
-        :return: self.row
-        '''
-        return self.row
+        return type(self).__name__
 
     def get_value(self):
         '''
@@ -130,7 +113,6 @@ class Pawn(Piece):
 
     def move_pattern(self):
         pass
-
 
 
 class Bishop(Piece):

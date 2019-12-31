@@ -25,7 +25,7 @@ class Interface:
 
     @staticmethod
     def calculate_row_col(pos, spacer, offset):
-        return int((pos - offset) / spacer)
+        return int(((pos - offset) / spacer)+.5)
 
     @staticmethod
     def calculate_xy(index, spacer, offset):
@@ -71,8 +71,8 @@ class Interface:
                 if piece:
                     col_index = board.index(col)
                     row_index = col.index(piece)
-                    self.reference.append(self.canvas.create_text(self.calculate_xy(row_index, spacer, offset),
-                                                                  self.calculate_xy(col_index, spacer, offset),
+                    self.reference.append(self.canvas.create_text(self.calculate_xy(col_index, spacer, offset),
+                                                                  self.calculate_xy(row_index, spacer, offset),
                                                                   text=piece.get_image(),
                                                                   font="TimesNewRoman {}".format(offset)))
                     piece.set_interface_ref(self.reference[len(self.reference)-1])
@@ -88,21 +88,31 @@ class Interface:
     def get_spacer(self):
         return int(self.window_size / self.game.get_board_size())
 
-    def get_xy_with_row_col(self, row, col):
+    def get_xy_with_col_row(self, col, row):
         spacer = self.get_spacer()
         offset = self.get_offset()
-        return self.calculate_xy(row, spacer, offset), self.calculate_xy(col, spacer, offset)
+        return self.calculate_xy(col, spacer, offset), self.calculate_xy(row, spacer, offset)
 
     def move_piece(self, event=None):
         if self.selected:
-            self.canvas.coords(self.selected.get_interface_ref(), event.x, event.y)
+            spacer = self.get_offset()
+            row, col = self.get_row_col_with_xy(event.y, event.x)
+            x, y = self.get_xy_with_col_row(col, row)
+            piece = self.game.get_space(col, row)
+            if piece and self.selected.get_color() == piece.get_color():
+                return
+            elif piece:
+                self.canvas.delete(piece.get_interface_ref())
+            self.canvas.coords(self.selected.get_interface_ref(),
+                               x, y)
+            self.game.move_piece(self.selected, row, col)
             self.selected = None
 
     def select_piece(self, event=None):
         if event:
             x, y = event.x, event.y
-            row, col = self.get_row_col_with_xy(x+self.get_offset(), y+self.get_offset())
-            self.selected = self.game.get_space(row, col)
+            col, row = self.get_row_col_with_xy(x, y)
+            self.selected = self.game.get_space(col, row)
             # self.reveal_movable(self.selected)
 
     def set_binds(self):

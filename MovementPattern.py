@@ -33,8 +33,8 @@ class Diagonal(MovementPattern):
         move_able = []
         # cur_pos = (X,Y)
         # Fix algorithm to check from piece instead of through the piece
-        x, y = piece.get_pos()
-        for index in range(-self.board.get_board_size(), board.get_board_size()):
+        x, y = board.get_piece_pos(piece)
+        for index in range(-board.get_board_size(), board.get_board_size()):
             i, j = x+index, y+index
             move_able.append((i, j))
         return move_able
@@ -50,8 +50,8 @@ class Horizontal(MovementPattern):
         move_able = []
         # cur_pos = (X,Y)
         # Fix algorithm to check from piece instead of through the piece
-        x, y = piece.get_pos()
-        for index in range(-self.board.get_board_size(), board.get_board_size()):
+        x, y = board.get_piece_pos(piece)
+        for index in range(-board.get_board_size(), board.get_board_size()):
             i, j = x+index, y
             move_able.append((i, j))
         return move_able
@@ -66,7 +66,7 @@ class LJump(MovementPattern):
     def return_positions(self, piece, board):
         moves = [(1, 3), (3, 1), (-1, 3), (3, -1), (1, -3), (-3, 1), (-3, -1), (-1, -3)]
         move_able = []
-        x, y = piece.get_pos()
+        x, y = board.get_piece_pos(piece)
         return move_able
 
 
@@ -80,8 +80,8 @@ class Vertical(MovementPattern):
         move_able = []
         # cur_pos = (X,Y)
         # Fix algorithm to check from piece instead of through the piece
-        x, y = piece.get_pos()
-        for index in range(-self.board.get_board_size(), board.get_board_size()):
+        x, y = board.get_piece_pos(piece)
+        for index in range(-board.get_board_size(), board.get_board_size()):
             i, j = x, y+index
             move_able.append((i, j))
         return move_able
