@@ -89,8 +89,8 @@ class Interface:
     def move_piece(self, event=None):
         if event:
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            if self.movable_position(self.selected, col, row):
-                location = self.game.get_space(col, row)
+            if self.movable_position(self.selected, row, col):
+                location = self.game.get_space(row, col)
                 x, y = self.get_xy_with_col_row(col, row)
                 self.canvas.coords(self.selected.get_interface_ref(), x, y)
                 if location:
