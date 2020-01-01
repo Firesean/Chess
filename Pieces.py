@@ -1,37 +1,17 @@
 class Piece:
-    '''
-    Piece Class,
-    piece_types is a selector for different classes,
-    piece is a dictionary containing (color and piece type) attributes for unicode of pieces
-    '''
-    piece_types = ["Pawn", "Knight", "Bishop", "Rook", "Queen", "King"]
     pieces = {"White Pawn": u"\u265F", "White Knight": u"\u265E", "White Bishop": u"\u265D",
               "White Rook": u"\u265C", "White Queen": u"\u265B", "White King": u"\u265A",
               "Black Pawn": u"\u2659", "Black Knight": u"\u2658", "Black Bishop": u"\u2657",
               "Black Rook": u"\u2656", "Black Queen": u"\u2655", "Black King": u"\u2654"}
 
     def __init__(self):  # Position = Row 1-8 (A - G) Col 1-8
-        '''
-        Generates Piece Class based on subclass,
-        pieceType is the name of current class,
-        color is set within program,
-        pattern is a list containing possible movement types
-        '''
         self.color = None
         self.interface_ref = None
-        self.patterns = []
-        self.value = 0
 
     def get_color(self):
-        '''
-        :return: self.color
-        '''
         return self.color
 
     def get_class_name(self):
-        '''
-        :return: class name
-        '''
         return type(self).__name__
 
     def get_image(self):
@@ -48,37 +28,15 @@ class Piece:
         return self.color + " " + self.get_piece_type()
 
     def get_interface_ref(self):
-        '''
-        :return: self.interface_ref
-        '''
         return self.interface_ref
 
     def get_piece_type(self):
-        '''
-        :return: self.pieceType
-        '''
         return type(self).__name__
 
-    def get_value(self):
-        '''
-        :return: Value
-        '''
-        return self.value
-
     def set_color(self, color):
-        '''
-        :param color:
-        :return: None
-        Sets piece color
-        '''
         self.color = color
 
     def set_interface_ref(self, ref):
-        '''
-        :param ref:
-        :return: None
-        Sets reference to interface for easy adjustments
-        '''
         self.interface_ref = ref
 
 
@@ -99,17 +57,6 @@ class Pawn(Piece):
         :return: Bool
         '''
         return self.onBench
-
-    def move(self, x, y):
-        '''
-        :param x:
-        :param y:
-        Eventually moves itself
-        :return: None
-        '''
-        self.col += y
-        self.row += x
-        self.onBench = False
 
     def move_pattern(self):
         pass

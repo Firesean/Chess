@@ -13,7 +13,7 @@ class Interface:
         self.game = game
         self.icon_ref = "chessPicture.ICO"
         self.selected = None
-        self.window_size = window_size  # (X, Y)
+        self.window_size = window_size
 
         # Main
         self.root.iconbitmap(self.icon_ref)
@@ -24,12 +24,18 @@ class Interface:
         self.root.mainloop()
 
     @staticmethod
-    def calculate_row_col(pos, spacer, offset):
+    def calculate_board_pos(pos, spacer, offset):
         return int(((pos - offset) / spacer)+.5)
 
     @staticmethod
-    def calculate_xy(index, spacer, offset):
+    def calculate_interface_pos(index, spacer, offset):
         return index * spacer + offset
+
+    def movable_position(self, piece, row, col):
+        position = self.game.get_space(row, col)
+        if position and piece.get_color() == position.get_color():
+            return False
+        return True
 
     def controller(self, event):
         if self.selected:
@@ -38,12 +44,6 @@ class Interface:
             self.select_piece(event)
 
     def draw_board(self):
-        '''
-        :param game:
-        :param window_size:
-        Draws the outline of the board
-        :return: None
-        '''
         self.canvas = tk.Canvas(height=self.window_size, width=self.window_size)
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
@@ -56,34 +56,26 @@ class Interface:
         # Place an outline around board
 
     def draw_pieces(self):
-        '''
-        :param game:
-        :param window_size:
-        Draws the pieces onto the board
-        Adds pieces to reference to later move pieces on the interface
-        :return: None
-        '''
         board = self.game.get_board()
         spacer = self.get_spacer()
         offset = self.get_offset()
-        for col in board:
-            for piece in col:
+        for row in board:
+            for piece in row:
                 if piece:
-                    col_index = board.index(col)
-                    row_index = col.index(piece)
-                    self.reference.append(self.canvas.create_text(self.calculate_xy(col_index, spacer, offset),
-                                                                  self.calculate_xy(row_index, spacer, offset),
+                    row, col = self.game.get_piece_pos(piece)
+                    self.reference.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
+                                                                  self.calculate_interface_pos(row, spacer, offset),
                                                                   text=piece.get_image(),
                                                                   font="TimesNewRoman {}".format(offset)))
-                    piece.set_interface_ref(self.reference[len(self.reference)-1])
+                    piece.set_interface_ref(self.reference[-1])
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
 
-    def get_row_col_with_xy(self, x, y):
+    def get_col_row_with_xy(self, x, y):
         spacer = self.get_spacer()
         offset = self.get_offset()
-        return self.calculate_row_col(x, spacer, offset), self.calculate_row_col(y, spacer, offset)
+        return self.calculate_board_pos(x, spacer, offset), self.calculate_board_pos(y, spacer, offset)
 
     def get_spacer(self):
         return int(self.window_size / self.game.get_board_size())
@@ -91,32 +83,34 @@ class Interface:
     def get_xy_with_col_row(self, col, row):
         spacer = self.get_spacer()
         offset = self.get_offset()
-        return self.calculate_xy(col, spacer, offset), self.calculate_xy(row, spacer, offset)
+        x, y = self.calculate_interface_pos(col, spacer, offset), self.calculate_interface_pos(row, spacer, offset)
+        return x, y
 
     def move_piece(self, event=None):
-        if self.selected:
-            spacer = self.get_offset()
-            row, col = self.get_row_col_with_xy(event.y, event.x)
-            x, y = self.get_xy_with_col_row(col, row)
-            piece = self.game.get_space(col, row)
-            if piece and self.selected.get_color() == piece.get_color():
-                return
-            elif piece:
-                self.canvas.delete(piece.get_interface_ref())
-            self.canvas.coords(self.selected.get_interface_ref(),
-                               x, y)
-            self.game.move_piece(self.selected, row, col)
-            self.selected = None
+        if event:
+            col, row = self.get_col_row_with_xy(event.x, event.y)
+            if self.movable_position(self.selected, col, row):
+                location = self.game.get_space(col, row)
+                x, y = self.get_xy_with_col_row(col, row)
+                self.canvas.coords(self.selected.get_interface_ref(), x, y)
+                if location:
+                    self.canvas.delete(location.get_interface_ref())
+                self.game.move_piece_on_board(self.selected, row, col)
+                self.selected = None
 
     def select_piece(self, event=None):
         if event:
             x, y = event.x, event.y
-            col, row = self.get_row_col_with_xy(x, y)
-            self.selected = self.game.get_space(col, row)
+            col, row = self.get_col_row_with_xy(x, y)
+            self.selected = self.game.get_space(row, col)
+            print(self.selected)
+            print("select")
             # self.reveal_movable(self.selected)
 
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
+        self.root.bind("<Button-3>", lambda event: self.game.print_board_pos())
+        self.root.bind("c", lambda event: self.game.print_board())
 
 
 
