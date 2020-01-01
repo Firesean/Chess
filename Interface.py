@@ -32,6 +32,11 @@ class Interface:
     def calculate_interface_pos(index, spacer, offset):
         return index * spacer + offset
 
+    def clear_movable(self):
+        for i in self.current_moves:
+            self.canvas.delete(i)
+        self.current_moves = []
+
     def controller(self, event):
         if self.selected:
             self.move_piece(event)
@@ -39,11 +44,14 @@ class Interface:
             self.select_piece(event)
 
     def display_moves(self, piece):
-        for i in self.current_moves:
-            self.canvas.delete(i)
-        self.current_moves = []
-        if piece.get_piece_type() == "Bishop":
-            movable = piece.patterns.return_positions(piece, self.game)
+        if piece.get_piece_type() in ["Bishop", "Rook"]:
+            movable = []
+            if isinstance(piece.patterns, tuple or list):
+                for pattern in piece.patterns:
+                    item = pattern.return_positions(piece, self.game)
+                    movable += item
+            else:
+                movable = piece.patterns.return_positions(piece, self.game)
             for move in movable:
                 row, col = move
                 y, x = self.get_xy_with_col_row(col, row)
@@ -104,6 +112,7 @@ class Interface:
 
     def move_piece(self, event=None):
         if event:
+            self.clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
             if self.movable_position(self.selected, row, col):
                 location = self.game.get_space(row, col)
@@ -112,16 +121,15 @@ class Interface:
                 if location:
                     self.canvas.delete(location.get_interface_ref())
                 self.game.move_piece_on_board(self.selected, row, col)
-                self.display_moves(self.selected)
-                self.selected = None
+            self.selected = None
 
     def select_piece(self, event=None):
         if event:
             x, y = event.x, event.y
             col, row = self.get_col_row_with_xy(x, y)
             self.selected = self.game.get_space(row, col)
-            print(self.selected)
-            print("select")
+            if self.selected:
+                self.display_moves(self.selected)
             # self.reveal_movable(self.selected)
 
     def set_binds(self):

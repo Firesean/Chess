@@ -98,6 +98,7 @@ class Rook(Piece):
     King moves over 2 spaces with the Rook placed behind the King's path
     '''
     moved = False
+    patterns = Pattern.Horizontal(), Pattern.Vertical()
     # Value : 5
     # Moves in straight lines (No diagonals) as far as possible
     # Castling if it hasn't moved from originally position
