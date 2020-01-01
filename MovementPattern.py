@@ -8,11 +8,6 @@ class MovementType(Enum):
 
 
 class MovementPattern:
-    '''
-    :param piece:
-    :param board:
-    :return: Possible Movements
-    '''
     # Range between numbers,
     # Set no matter what it has to move a certain amount,
     # conditional like castling and En Passant
@@ -31,12 +26,27 @@ class Diagonal(MovementPattern):
         :return: Possible Movements
         '''
         move_able = []
-        # cur_pos = (X,Y)
-        # Fix algorithm to check from piece instead of through the piece
-        x, y = board.get_piece_pos(piece)
-        for index in range(-board.get_board_size(), board.get_board_size()):
-            i, j = x+index, y+index
-            move_able.append((i, j))
+        old_row, old_col = board.get_piece_pos(piece)
+        for corner in range(1, 5):
+            corner = bin(corner)
+            corner = corner[-2:].replace("b", "0")
+            x_dir, y_dir = int(str(corner[0]).replace("0", "-1")), int(str(corner[1]).replace("0", "-1"))
+            print(x_dir, y_dir)
+            for i in range(1, self.distance):
+                new_row, new_col = old_row+i*x_dir, old_col+i*y_dir
+                space = board.get_space(new_row, new_col)
+                if new_row < 0 or new_col < 0:  # Off Board
+                    print(1)
+                    continue
+                elif space and space.get_color() == piece.get_color():  # Runs into same colored piece
+                    print(2)
+                    break
+                elif space:  # Runs into piece
+                    print(3)
+                    move_able.append((new_col, new_row))
+                    break
+                else:  # Other
+                    move_able.append((new_col, new_row))
         return move_able
 
 

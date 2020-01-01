@@ -1,3 +1,6 @@
+import MovementPattern as Pattern
+
+
 class Piece:
     pieces = {"White Pawn": u"\u265F", "White Knight": u"\u265E", "White Bishop": u"\u265D",
               "White Rook": u"\u265C", "White Queen": u"\u265B", "White King": u"\u265A",
@@ -67,7 +70,7 @@ class Bishop(Piece):
     Bishop,
     Moves diagonally infinitely on to an enemy piece or before a friendly piece
     '''
-    pass
+    patterns = Pattern.Diagonal()
     # Value : 3
     # Moves diagonally as far as possible
 

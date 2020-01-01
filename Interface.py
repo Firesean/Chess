@@ -9,18 +9,19 @@ class Interface:
 
         # Declarations
         self.canvas = None
-        self.reference = []
+        self.current_moves = []
         self.game = game
         self.icon_ref = "chessPicture.ICO"
+        self.reference = []
         self.selected = None
         self.window_size = window_size
 
         # Main
-        self.root.iconbitmap(self.icon_ref)
         self.draw_board()
         self.draw_pieces()
         self.set_binds()
         self.root.title(type(game).__name__)
+        self.root.iconbitmap(self.icon_ref)
         self.root.mainloop()
 
     @staticmethod
@@ -31,17 +32,26 @@ class Interface:
     def calculate_interface_pos(index, spacer, offset):
         return index * spacer + offset
 
-    def movable_position(self, piece, row, col):
-        position = self.game.get_space(row, col)
-        if position and piece.get_color() == position.get_color():
-            return False
-        return True
-
     def controller(self, event):
         if self.selected:
             self.move_piece(event)
         else:
             self.select_piece(event)
+
+    def display_moves(self, piece):
+        for i in self.current_moves:
+            self.canvas.delete(i)
+        self.current_moves = []
+        if piece.get_piece_type() == "Bishop":
+            movable = piece.patterns.return_positions(piece, self.game)
+            for move in movable:
+                row, col = move
+                y, x = self.get_xy_with_col_row(col, row)
+                offset = self.get_offset()
+                self.current_moves.append(self.canvas.create_rectangle(x-offset, y-offset,
+                                                                       x+offset, y+offset,
+                                                                       fill="green"))
+                self.canvas.lower(self.current_moves[-1])
 
     def draw_board(self):
         self.canvas = tk.Canvas(height=self.window_size, width=self.window_size)
@@ -86,6 +96,12 @@ class Interface:
         x, y = self.calculate_interface_pos(col, spacer, offset), self.calculate_interface_pos(row, spacer, offset)
         return x, y
 
+    def movable_position(self, piece, row, col):
+        position = self.game.get_space(row, col)
+        if position and piece.get_color() == position.get_color():
+            return False
+        return True
+
     def move_piece(self, event=None):
         if event:
             col, row = self.get_col_row_with_xy(event.x, event.y)
@@ -96,6 +112,7 @@ class Interface:
                 if location:
                     self.canvas.delete(location.get_interface_ref())
                 self.game.move_piece_on_board(self.selected, row, col)
+                self.display_moves(self.selected)
                 self.selected = None
 
     def select_piece(self, event=None):
