@@ -44,14 +44,15 @@ class Interface:
             self.select_piece(event)
 
     def display_moves(self, piece):
-        if piece.get_piece_type() in ["Bishop", "Rook"]:
-            movable = []
-            if isinstance(piece.patterns, tuple or list):
-                for pattern in piece.patterns:
-                    item = pattern.return_positions(piece, self.game)
-                    movable += item
-            else:
-                movable = piece.patterns.return_positions(piece, self.game)
+        try:
+            if piece.patterns:
+                movable = []
+                if isinstance(piece.patterns, tuple or list):
+                    for pattern in piece.patterns:
+                        item = pattern.return_positions(piece, self.game)
+                        movable += item
+                else:
+                    movable = piece.patterns.return_positions(piece, self.game)
             for move in movable:
                 row, col = move
                 y, x = self.get_xy_with_col_row(col, row)
@@ -60,6 +61,8 @@ class Interface:
                                                                        x+offset, y+offset,
                                                                        fill="green"))
                 self.canvas.lower(self.current_moves[-1])
+        except AttributeError:
+            print("No Patterns")
 
     def draw_board(self):
         self.canvas = tk.Canvas(height=self.window_size, width=self.window_size)
@@ -107,6 +110,8 @@ class Interface:
     def movable_position(self, piece, row, col):
         position = self.game.get_space(row, col)
         if position and piece.get_color() == position.get_color():
+            return False
+        if not self.game.is_on_board(row, col):
             return False
         return True
 

@@ -1,19 +1,31 @@
 from enum import Enum
 
 
-class MovementType(Enum):
-    CONDITIONAL = 0
-    RANGE = 1
-    SET = 2
-
-
 class MovementPattern:
     # Range between numbers,
     # Set no matter what it has to move a certain amount,
     # conditional like castling and En Passant
+    X_index = 0
+    Y_index = 1
 
-    def __init__(self, distance=8):
+    def __init__(self, direction=2, distance=8):
         self.distance = distance
+        self.direction = direction
+
+    @staticmethod
+    def get_direction_of(given, requested):
+        given = bin(given + 1)[-2:].replace("b", "0")
+        return int(str(given[requested]).replace("0", "-1"))
+
+    @staticmethod
+    def is_movable(board, piece, new_row, new_col):
+        space = board.get_space(new_row, new_col)
+        if not board.is_on_board(new_row, new_col):
+            return False
+        elif space and space.get_color() == piece.get_color():  # Runs into same colored piece
+            return False
+        else:  # Other
+            return True
 
 
 class Diagonal(MovementPattern):
@@ -25,22 +37,17 @@ class Diagonal(MovementPattern):
         :return: Possible Movements
         '''
         move_able = []
-        old_row, old_col = board.get_piece_pos(piece)
-        for corner in range(4):
-            corner = bin(corner+1)[-2:].replace("b", "0")
-            x_dir, y_dir = int(str(corner[0]).replace("0", "-1")), int(str(corner[1]).replace("0", "-1"))
+        cur_row, cur_col = board.get_piece_pos(piece)
+        for corner in range(self.direction):
+            x_dir, y_dir = self.get_direction_of(corner, self.X_index), self.get_direction_of(corner, self.Y_index)
             for i in range(1, self.distance):
-                new_row, new_col = old_row+i*x_dir, old_col+i*y_dir
-                space = board.get_space(new_row, new_col)
-                if new_row < 0 or new_col < 0:  # Off Board
-                    continue
-                elif space and space.get_color() == piece.get_color():  # Runs into same colored piece
-                    break
-                elif space:  # Runs into piece
+                new_row, new_col = cur_row+i*x_dir, cur_col+i*y_dir
+                if self.is_movable(board, piece, new_row, new_col):
                     move_able.append([new_col, new_row])
+                    if board.get_space(*move_able[-1][::-1]):
+                        break
+                else:
                     break
-                else:  # Other
-                    move_able.append([new_col, new_row])
         return move_able
 
 
@@ -53,22 +60,17 @@ class Horizontal(MovementPattern):
         :return: Possible Movements
         '''
         move_able = []
-        old_row, cur_col = board.get_piece_pos(piece)
-        for corner in range(2):
-            corner = bin(corner+1)[-2:].replace("b", "0")
-            x_dir = int(str(corner[0]).replace("0", "-1"))
+        cur_row, cur_col = board.get_piece_pos(piece)
+        for corner in range(self.direction):
+            x_dir = self.get_direction_of(corner, self.X_index)
             for i in range(1, self.distance):
                 new_col = cur_col+i*x_dir
-                space = board.get_space(old_row, new_col)
-                if new_col < 0:  # Off Board
-                    continue
-                elif space and space.get_color() == piece.get_color():  # Runs into same colored piece
+                if self.is_movable(board, piece, cur_row, new_col):
+                    move_able.append([new_col, cur_row])
+                    if board.get_space(*move_able[-1][::-1]):
+                        break
+                else:
                     break
-                elif space:  # Runs into piece
-                    move_able.append([new_col, old_row])
-                    break
-                else:  # Other
-                    move_able.append([new_col, old_row])
         return move_able
 
 
@@ -94,22 +96,17 @@ class Vertical(MovementPattern):
         :return: Possible Movements
         '''
         move_able = []
-        old_row, cur_col = board.get_piece_pos(piece)
-        for corner in range(2):
-            corner = bin(corner+1)[-2:].replace("b", "0")
-            y_dir = int(str(corner[1]).replace("0", "-1"))
+        cur_row, cur_col = board.get_piece_pos(piece)
+        for corner in range(self.direction):
+            y_dir = self.get_direction_of(corner, self.Y_index)
             for i in range(1, self.distance):
-                new_row = old_row+i*y_dir
-                space = board.get_space(new_row, cur_col)
-                if new_row < 0:  # Off Board
-                    continue
-                elif space and space.get_color() == piece.get_color():  # Runs into same colored piece
-                    break
-                elif space:  # Runs into piece
+                new_row = cur_row+i*y_dir
+                if self.is_movable(board, piece, new_row, cur_col):
                     move_able.append([cur_col, new_row])
+                    if board.get_space(*move_able[-1][::-1]):
+                        break
+                else:
                     break
-                else:  # Other
-                    move_able.append([cur_col, new_row])
         return move_able
 
 

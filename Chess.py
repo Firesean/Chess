@@ -33,10 +33,17 @@ class Chess:
                 return i, self.board[i].index(piece)  # row, col
 
     def get_space(self, row, col):
-        try:
+        if self.is_on_board(row, col):
             return self.board[row][col]
-        except IndexError:
+        else:
             return None
+
+    def is_on_board(self, row, col):
+        if row < 0 or col < 0:
+            return False
+        if row >= self.get_board_size() or col >= self.get_board_size():
+            return False
+        return True
 
     def move_piece_on_board(self, piece, row, col):
         old_row, old_col = self.get_piece_pos(piece)

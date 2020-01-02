@@ -70,7 +70,7 @@ class Bishop(Piece):
     Bishop,
     Moves diagonally infinitely on to an enemy piece or before a friendly piece
     '''
-    patterns = Pattern.Diagonal()
+    patterns = Pattern.Diagonal(4)
     # Value : 3
     # Moves diagonally as far as possible
 
@@ -98,7 +98,7 @@ class Rook(Piece):
     King moves over 2 spaces with the Rook placed behind the King's path
     '''
     moved = False
-    patterns = Pattern.Horizontal(), Pattern.Vertical()
+    patterns = Pattern.Horizontal(2), Pattern.Vertical(2)
     # Value : 5
     # Moves in straight lines (No diagonals) as far as possible
     # Castling if it hasn't moved from originally position
@@ -109,7 +109,7 @@ class Queen(Piece):
     Queen,
     Moves Horizontal, Vertical, and Diagonal infinitely on to an enemy piece or before a friendly piece
     '''
-    pass
+    patterns = Pattern.Vertical(2), Pattern.Horizontal(2), Pattern.Diagonal(4)
     # Value : 9
     # Moves any direction as far as possible
     # Most valuable piece
@@ -126,6 +126,7 @@ class King(Piece):
     # Value : inf
     inCheck = False
     moved = False
+    patterns = Pattern.Vertical(2, 2), Pattern.Horizontal(2, 2), Pattern.Diagonal(4, 2)
 
     def get_in_check(self):
         '''
