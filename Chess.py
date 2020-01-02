@@ -56,25 +56,10 @@ class Chess:
             self.board.append([None])
             self.board[row] *= self.board_size
 
-    def print_board(self):
-        for row in self.board:
-            for piece in row:
-                if not piece:
-                    print(u"\u0011", end=" ")
-                    continue
-                print(Piece.pieces[piece.get_image_path()], end=" ")
-            print("\n")
-
-    def print_board_pos(self):
-        for row in self.board:
-            for piece in row:
-                if not piece:
-                    print(u"\u0011", end=" ")
-                    continue
-                print(self.get_piece_pos(piece), end=" ")
-            print("\n")
-
     def set_pieces(self):
+        '''
+        Generates the board with new pieces and sets location & color
+        '''
         for start, end, side, color in [[1, -1, -1, self.default_colors[0]],
                                         [self.board_size-2, self.board_size, 1, self.default_colors[1]]]:
             for row in range(start, end, side):

@@ -55,14 +55,7 @@ class Pawn(Piece):
     onBench = True
 
     def at_bench(self):
-        '''
-        Checks to see if moved
-        :return: Bool
-        '''
         return self.onBench
-
-    def move_pattern(self):
-        pass
 
 
 class Bishop(Piece):
@@ -126,18 +119,12 @@ class King(Piece):
     # Value : inf
     inCheck = False
     moved = False
-    patterns = Pattern.Vertical(2, 2), Pattern.Horizontal(2, 2), Pattern.Diagonal(4, 2)
+    patterns = Pattern.Vertical(2, 1), Pattern.Horizontal(2, 1), Pattern.Diagonal(4, 1)
 
     def get_in_check(self):
-        '''
-        :return: inCheck
-        '''
         return self.inCheck
 
     def has_moved(self):
-        '''
-        :return: Moved
-        '''
         return self.moved
 
     # Moves any direction by one square

@@ -44,6 +44,11 @@ class Interface:
             self.select_piece(event)
 
     def display_moves(self, piece):
+        '''
+        :param piece:
+        Goes through the pieces pattern's to show movable locations
+        Displays the movable locations
+        '''
         try:
             if piece.patterns:
                 movable = []
@@ -65,6 +70,9 @@ class Interface:
             print("No Patterns")
 
     def draw_board(self):
+        '''
+        Draws the design structure of the board as a grid and borders and *colors needed parts
+        '''
         self.canvas = tk.Canvas(height=self.window_size, width=self.window_size)
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
@@ -77,6 +85,9 @@ class Interface:
         # Place an outline around board
 
     def draw_pieces(self):
+        '''
+        Draws pieces onto the board
+        '''
         board = self.game.get_board()
         spacer = self.get_spacer()
         offset = self.get_offset()
@@ -116,6 +127,10 @@ class Interface:
         return True
 
     def move_piece(self, event=None):
+        '''
+        :param event:
+        Checks if pieces can move and will move to selected position
+        '''
         if event:
             self.clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
@@ -139,8 +154,7 @@ class Interface:
 
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
-        self.root.bind("<Button-3>", lambda event: self.game.print_board_pos())
-        self.root.bind("c", lambda event: self.game.print_board())
+
 
 
 
