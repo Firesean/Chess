@@ -53,6 +53,7 @@ class Pawn(Piece):
     Must switch piece type if reaches opponents edge,
     '''
     onBench = True
+    patterns = Pattern.Vertical(2, 2), Pattern.Diagonal(4, 1), Pattern.Vertical(2, 1)
 
     def at_bench(self):
         return self.onBench
@@ -76,7 +77,7 @@ class Knight(Piece):
     Left or Right 3 Up or Down 1
     Can Hop Pieces
     '''
-    pass
+    patterns = Pattern.LJump()
     # Value : 3
     # Moves in a L pattern 3 vertically 1 across or 1 vertically and 3 across from
     # Current position

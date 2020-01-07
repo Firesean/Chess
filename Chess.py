@@ -4,7 +4,8 @@ from Pieces import *
 
 
 class Chess:
-    default_colors = ["Black", "White"]
+    default_piece_colors = ["Black", "White"]
+    default_board_colors = ["gray98", "LightSalmon4"]
     board_size = 8
     default_board_state = ([Pawn().get_class_name()] + [Rook().get_class_name(), Knight().get_class_name(),
                            Bishop().get_class_name(), Queen().get_class_name(),
@@ -27,6 +28,12 @@ class Chess:
     def get_board_size(self):
         return self.board_size
 
+    def get_default_board_colors(self):
+        return self.default_board_colors
+
+    def get_default_piece_colors(self):
+        return self.default_piece_colors
+
     def get_piece_pos(self, piece):
         for i in range(len(self.board)):
             if piece in self.board[i]:
@@ -35,8 +42,7 @@ class Chess:
     def get_space(self, row, col):
         if self.is_on_board(row, col):
             return self.board[row][col]
-        else:
-            return None
+        return None
 
     def is_on_board(self, row, col):
         if row < 0 or col < 0:
@@ -60,8 +66,8 @@ class Chess:
         '''
         Generates the board with new pieces and sets location & color
         '''
-        for start, end, side, color in [[1, -1, -1, self.default_colors[0]],
-                                        [self.board_size-2, self.board_size, 1, self.default_colors[1]]]:
+        for start, end, side, color in [[1, -1, -1, self.default_piece_colors[0]],
+                                        [self.board_size-2, self.board_size, 1, self.default_piece_colors[1]]]:
             for row in range(start, end, side):
                 for col in range(self.board_size):
                     piece = self.default_board_state[col + 1]

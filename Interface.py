@@ -19,6 +19,7 @@ class Interface:
         # Main
         self.draw_board()
         self.draw_pieces()
+        self.draw_spaces()
         self.set_binds()
         self.root.title(type(game).__name__)
         self.root.iconbitmap(self.icon_ref)
@@ -60,12 +61,11 @@ class Interface:
                     movable = piece.patterns.return_positions(piece, self.game)
             for move in movable:
                 row, col = move
-                y, x = self.get_xy_with_col_row(col, row)
+                x, y = self.get_xy_with_col_row(row, col)
                 offset = self.get_offset()
                 self.current_moves.append(self.canvas.create_rectangle(x-offset, y-offset,
                                                                        x+offset, y+offset,
                                                                        fill="green"))
-                self.canvas.lower(self.current_moves[-1])
         except AttributeError:
             print("No Patterns")
 
@@ -100,6 +100,22 @@ class Interface:
                                                                   text=piece.get_image(),
                                                                   font="TimesNewRoman {}".format(offset)))
                     piece.set_interface_ref(self.reference[-1])
+
+    def draw_spaces(self):
+        board_size = self.game.get_board_size()
+        spacer = self.get_spacer()
+        offset = self.get_offset()
+        colors = self.game.get_default_board_colors()
+        for row in range(board_size):
+            for col in range(board_size):
+                x, y = self.get_xy_with_col_row(col, row)
+                color = colors[0]
+                if row % 2 == col % 2:
+                    color = colors[1]
+                item = self.canvas.create_rectangle(x - offset, y - offset,
+                                                    x + offset, y + offset,
+                                                    fill=color)
+                self.canvas.lower(item)
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
