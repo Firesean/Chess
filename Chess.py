@@ -5,7 +5,8 @@ from Pieces import *
 
 class Chess:
     default_piece_colors = ["Black", "White"]
-    default_board_colors = ["gray98", "LightSalmon4"]
+    default_board_colors = ["gray", "LightSalmon4"]
+    default_movement_color = "firebrick3"
     board_size = 8
     default_board_state = ([Pawn().get_class_name()] + [Rook().get_class_name(), Knight().get_class_name(),
                            Bishop().get_class_name(), Queen().get_class_name(),
@@ -22,6 +23,10 @@ class Chess:
         self.set_pieces()
         self.selected_piece = None
 
+    @staticmethod
+    def create_piece(piece):
+        return eval(f'{piece}()')
+
     def get_board(self):
         return self.board
 
@@ -31,13 +36,16 @@ class Chess:
     def get_default_board_colors(self):
         return self.default_board_colors
 
+    def get_default_movement_color(self):
+        return self.default_movement_color
+
     def get_default_piece_colors(self):
         return self.default_piece_colors
 
     def get_piece_pos(self, piece):
-        for i in range(len(self.board)):
-            if piece in self.board[i]:
-                return i, self.board[i].index(piece)  # row, col
+        for row in range(len(self.board)):
+            if piece in self.board[row]:
+                return row, self.board[row].index(piece)  # row, col
 
     def get_space(self, row, col):
         if self.is_on_board(row, col):
@@ -73,7 +81,7 @@ class Chess:
                     piece = self.default_board_state[col + 1]
                     if row == start:
                         piece = self.default_board_state[0]
-                    new_piece = eval("{0}()".format(piece))
+                    new_piece = self.create_piece(piece)
                     self.board[row][col] = new_piece
                     self.get_space(row, col).set_color(color)
 

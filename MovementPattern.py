@@ -5,15 +5,15 @@ class MovementPattern:
     X_index = 0
     Y_index = 1
 
-    def __init__(self, quadrant_corner=2, max_distance=7):
+    def __init__(self, quadrant_corners=2, max_distance=7):
         self.max_distance = max_distance
-        self.quadrant_corner = quadrant_corner
+        self.quadrant_corners = quadrant_corners
 
     @staticmethod
     def get_direction_of(quadrant, axis_direction):
         # Input is a quadrant, in a geometric / algebraic  term of a xy axis graph
         # The piece is considered a 0,0 and directions around the piece are determined by input
-        # With the quadrant we choose we determine which direction within the quadrant we return based on the axis_direction
+        # With the quadrant we choose and determine which direction within the quadrant we return based on the axis_direction
         # Either X or Y value within the binary is returned X - 0 Index , Y - 1 Index
         '''
         :param quadrant:
@@ -26,8 +26,8 @@ class MovementPattern:
         #            xy xy xy xy
         return int(str(quadrant[axis_direction]).replace("0", "-1"))  # Returns the direction of item based on index given
         # Outputs
-        # Horizontal : 1 = Right, -1 = Left using X index
-        # Vertical : -1 = Up, 1 = Down using Y index
+        # Horizontal : 1 = Right, -1 = Left using a index
+        # Vertical : -1 = Up, 1 = Down using a index
         # Diagonal : -1, 1 = Top Left, 1, -1 = Bottom Right, 1, 1 = Top Right, -1, -1 = Bottom Left, using Both indexes
 
     @staticmethod
@@ -58,7 +58,8 @@ class Diagonal(MovementPattern):
         '''
         move_able = []
         cur_row, cur_col = board.get_piece_pos(piece)
-        for quadrant in range(self.quadrant_corner):
+        # Refer to get_direction_of for understanding of the algorithm below
+        for quadrant in range(self.quadrant_corners):
             x_dir, y_dir = self.get_direction_of(quadrant, self.X_index), self.get_direction_of(quadrant, self.Y_index)
             for distance in range(1, self.max_distance + 1):
                 new_row, new_col = cur_row + distance * x_dir, cur_col + distance * y_dir
@@ -81,10 +82,11 @@ class Horizontal(MovementPattern):
         '''
         move_able = []
         cur_row, cur_col = board.get_piece_pos(piece)
-        for quadrant in range(self.quadrant_corner):
+        # Refer to get_direction_of for understanding of the algorithm below
+        for quadrant in range(self.quadrant_corners):
             x_dir = self.get_direction_of(quadrant, self.X_index)
-            for i in range(1, self.max_distance + 1):
-                new_col = cur_col + i * x_dir
+            for distance in range(1, self.max_distance + 1):
+                new_col = cur_col + distance * x_dir
                 if self.is_movable(board, piece, cur_row, new_col):
                     move_able.append([new_col, cur_row])
                     if board.get_space(*move_able[-1][::-1]):
@@ -102,13 +104,16 @@ class LJump(MovementPattern):
         :param board:
         :return: Possible Movements
         '''
-        moves = [(1, 2), (2, 1), (-1, 2), (2, -1), (1, -2), (-2, 1), (-2, -1), (-1, -2)]
+        moves = [(1, self.max_distance),(self.max_distance ,1)]
         move_able = []
         cur_row, cur_col = board.get_piece_pos(piece)
-        for move in moves:
-            new_row, new_col = cur_row + move[0], cur_col + move[1]
-            if self.is_movable(board, piece, new_row, new_col):
-                move_able.append([new_col, new_row])
+        # Refer to get_direction_of for understanding of the algorithm below
+        for quadrant in range(self.quadrant_corners):
+            x_dir, y_dir = self.get_direction_of(quadrant, self.X_index), self.get_direction_of(quadrant, self.Y_index)
+            for move in moves:
+                new_row, new_col = cur_row + move[self.X_index]*x_dir, cur_col + move[self.Y_index]*y_dir
+                if self.is_movable(board, piece, new_row, new_col):
+                    move_able.append([new_col, new_row])
         return move_able
 
 
@@ -122,12 +127,14 @@ class Vertical(MovementPattern):
         '''
         move_able = []
         cur_row, cur_col = board.get_piece_pos(piece)
-        for quadrant in range(self.quadrant_corner):
+        # Refer to get_direction_of for understanding of the algorithm below
+        for quadrant in range(self.quadrant_corners):
             y_dir = self.get_direction_of(quadrant, self.Y_index)
-            for i in range(1, self.max_distance + 1):
-                new_row = cur_row + i * y_dir
+            for distance in range(1, self.max_distance + 1):
+                new_row = cur_row + distance * y_dir
                 if self.is_movable(board, piece, new_row, cur_col):
-                    if piece.get_piece_type() == Pieces.Pawn().get_class_name():
+                    if piece.get_piece_name() == Pieces.Pawn().get_class_name():
+                        # To be added
                         piece_color = piece.get_color()
                         colors = board.get_default_piece_colors()
                         index_of = int(str(colors.index(piece_color)).replace("0", "-1"))

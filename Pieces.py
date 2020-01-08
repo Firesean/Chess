@@ -2,38 +2,43 @@ import MovementPattern as Pattern
 
 
 class Piece:
-    pieces = {"White Pawn": u"\u265F", "White Knight": u"\u265E", "White Bishop": u"\u265D",
-              "White Rook": u"\u265C", "White Queen": u"\u265B", "White King": u"\u265A",
-              "Black Pawn": u"\u2659", "Black Knight": u"\u2658", "Black Bishop": u"\u2657",
-              "Black Rook": u"\u2656", "Black Queen": u"\u2655", "Black King": u"\u2654"}
+    # Unicode for White pieces only.
+    # Transparency on the black pieces only shows outline while white pieces focus on details
+    pieces = {"Pawn": u"\u265F", "Knight": u"\u265E", "Bishop": u"\u265D",
+              "Rook": u"\u265C", "Queen": u"\u265B", "King": u"\u265A"}
+
+    # pieces = {"White Pawn": u"\u265F", "White Knight": u"\u265E", "White Bishop": u"\u265D",
+    #           "White Rook": u"\u265C", "White Queen": u"\u265B", "White King": u"\u265A",
+    #           "Black Pawn": u"\u2659", "Black Knight": u"\u2658", "Black Bishop": u"\u2657",
+    #           "Black Rook": u"\u2656", "Black Queen": u"\u2655", "Black King": u"\u2654"}
 
     def __init__(self):  # Position = Row 1-8 (A - G) Col 1-8
         self.color = None
         self.interface_ref = None
 
-    def get_color(self):
-        return self.color
-
     def get_class_name(self):
         return type(self).__name__
 
-    def get_image(self):
+    def get_color(self):
+        return self.color
+
+    def get_unicode(self):
         '''
         :return: Unicode Image
         '''
-        return self.pieces[self.get_image_path()]
+        return self.pieces[self.get_piece_name()]
 
-    def get_image_path(self):
+    def get_unicode_mapping(self):
         '''
         :return: Dictionary Key for unicode
         Using the color and pieceType class name
         '''
-        return self.color + " " + self.get_piece_type()
+        return self.color + " " + self.get_piece_name()
 
     def get_interface_ref(self):
         return self.interface_ref
 
-    def get_piece_type(self):
+    def get_piece_name(self):
         return type(self).__name__
 
     def set_color(self, color):
@@ -45,7 +50,7 @@ class Piece:
 
 class Pawn(Piece):
     '''
-    Pawn, weakest but no the worst piece,
+    Pawn, weakest but not the worst piece,
     Moves one square upwards at a time,
     Can attack diagonally by one square,
     Can move upwards by two square while on bench,
@@ -77,9 +82,9 @@ class Knight(Piece):
     Left or Right 3 Up or Down 1
     Can Hop Pieces
     '''
-    patterns = Pattern.LJump()
+    patterns = Pattern.LJump(4, 2)
     # Value : 3
-    # Moves in a L pattern 3 vertically 1 across or 1 vertically and 3 across from
+    # Moves in a L pattern 2 vertically 1 across or 1 vertically and 2 across from
     # Current position
     # Can hop over pieces
 

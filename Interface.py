@@ -2,6 +2,10 @@ import tkinter as tk
 
 
 class Interface:
+    board_tag = "board_tag"
+    movement_tag = "movement"
+    piece_tag = "piece"
+    interface_start_pos = 2
 
     def __init__(self, game, window_size, root=tk.Tk()):
         # Root
@@ -19,7 +23,6 @@ class Interface:
         # Main
         self.draw_board()
         self.draw_pieces()
-        self.draw_spaces()
         self.set_binds()
         self.root.title(type(game).__name__)
         self.root.iconbitmap(self.icon_ref)
@@ -34,8 +37,8 @@ class Interface:
         return index * spacer + offset
 
     def clear_movable(self):
-        for i in self.current_moves:
-            self.canvas.delete(i)
+        for move in self.current_moves:
+            self.canvas.delete(move)
         self.current_moves = []
 
     def controller(self, event):
@@ -50,22 +53,27 @@ class Interface:
         Goes through the pieces pattern's to show movable locations
         Displays the movable locations
         '''
+        move_able = []
         try:
             if piece.patterns:
-                movable = []
                 if isinstance(piece.patterns, tuple or list):
                     for pattern in piece.patterns:
-                        item = pattern.return_positions(piece, self.game)
-                        movable += item
+                        move = pattern.return_positions(piece, self.game)
+                        move_able += move
                 else:
-                    movable = piece.patterns.return_positions(piece, self.game)
-            for move in movable:
+                    move_able = piece.patterns.return_positions(piece, self.game)
+            for move in move_able:
                 row, col = move
                 x, y = self.get_xy_with_col_row(row, col)
                 offset = self.get_offset()
-                self.current_moves.append(self.canvas.create_rectangle(x-offset, y-offset,
-                                                                       x+offset, y+offset,
-                                                                       fill="green"))
+
+                self.current_moves.append(self.canvas.create_rectangle(x-offset,
+                                                                       y-offset,
+                                                                       x+offset,
+                                                                       y+offset,
+                                                                       fill=self.game.get_default_movement_color()))
+
+                self.canvas.lift(self.piece_tag)
         except AttributeError:
             print("No Patterns")
 
@@ -78,10 +86,27 @@ class Interface:
         spacer = self.get_spacer()
         self.root.geometry("{0}x{0}".format(self.window_size+spacer))
         for line in range(board_size):
-            self.canvas.create_line(2, line * spacer, self.window_size, line * spacer)
-            self.canvas.create_line(line * spacer, 2, line * spacer, self.window_size)
-        self.canvas.create_rectangle(2, 2, self.window_size, self.window_size)
+
+            self.canvas.create_line(self.interface_start_pos,
+                                    line * spacer,
+                                    self.window_size,
+                                    line * spacer,
+                                    tags=self.board_tag)
+
+            self.canvas.create_line(line * spacer,
+                                    self.interface_start_pos,
+                                    line * spacer,
+                                    self.window_size,
+                                    tags=self.board_tag)
+
+        self.canvas.create_rectangle(self.interface_start_pos,
+                                     self.interface_start_pos,
+                                     self.window_size,
+                                     self.window_size,
+                                     tags=self.board_tag)
+
         self.canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Centers the canvas in Root Window
+        self.draw_squares()
         # Place an outline around board
 
     def draw_pieces(self):
@@ -97,13 +122,14 @@ class Interface:
                     row, col = self.game.get_piece_pos(piece)
                     self.reference.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
                                                                   self.calculate_interface_pos(row, spacer, offset),
-                                                                  text=piece.get_image(),
-                                                                  font="TimesNewRoman {}".format(offset)))
+                                                                  text=piece.get_unicode(),
+                                                                  font="TimesNewRoman {}".format(offset),
+                                                                  tags=self.piece_tag,
+                                                                  fill=piece.get_color()))
                     piece.set_interface_ref(self.reference[-1])
 
-    def draw_spaces(self):
+    def draw_squares(self):
         board_size = self.game.get_board_size()
-        spacer = self.get_spacer()
         offset = self.get_offset()
         colors = self.game.get_default_board_colors()
         for row in range(board_size):
@@ -112,10 +138,13 @@ class Interface:
                 color = colors[0]
                 if row % 2 == col % 2:
                     color = colors[1]
-                item = self.canvas.create_rectangle(x - offset, y - offset,
-                                                    x + offset, y + offset,
-                                                    fill=color)
-                self.canvas.lower(item)
+
+                self.canvas.create_rectangle(x - offset,
+                                             y - offset,
+                                             x + offset,
+                                             y + offset,
+                                             fill=color,
+                                             tags=self.board_tag)
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
@@ -162,11 +191,13 @@ class Interface:
     def select_piece(self, event=None):
         if event:
             x, y = event.x, event.y
+            offset = self.get_offset()
+            if x < offset or y < offset: # Determines within the interface
+                return
             col, row = self.get_col_row_with_xy(x, y)
             self.selected = self.game.get_space(row, col)
             if self.selected:
                 self.display_moves(self.selected)
-            # self.reveal_movable(self.selected)
 
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
