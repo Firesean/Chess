@@ -16,9 +16,6 @@ class Piece:
         self.color = None
         self.interface_ref = None
 
-    def get_class_name(self):
-        return type(self).__name__
-
     def get_color(self):
         return self.color
 

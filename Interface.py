@@ -192,7 +192,7 @@ class Interface:
         if event:
             x, y = event.x, event.y
             offset = self.get_offset()
-            if x < offset or y < offset: # Determines within the interface
+            if x < offset or y < offset:
                 return
             col, row = self.get_col_row_with_xy(x, y)
             self.selected = self.game.get_space(row, col)

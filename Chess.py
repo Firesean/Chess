@@ -4,14 +4,15 @@ from Pieces import *
 
 
 class Chess:
-    default_piece_colors = ["Black", "White"]
     default_board_colors = ["gray", "LightSalmon4"]
     default_movement_color = "firebrick3"
+    default_piece_colors = ["Black", "White"]
+    default_piece_directions = {f"{default_piece_colors[0]}" : 1, f"{default_piece_colors[1]}" : -1} # Down = 1 , Up = 1
     board_size = 8
-    default_board_state = ([Pawn().get_class_name()] + [Rook().get_class_name(), Knight().get_class_name(),
-                           Bishop().get_class_name(), Queen().get_class_name(),
-                           King().get_class_name(), Bishop().get_class_name(),
-                           Knight().get_class_name(), Rook().get_class_name()])
+    default_board_state = ([Pawn().get_piece_name()] + [Rook().get_piece_name(), Knight().get_piece_name(),
+                                                        Bishop().get_piece_name(), Queen().get_piece_name(),
+                                                        King().get_piece_name(), Bishop().get_piece_name(),
+                                                        Knight().get_piece_name(), Rook().get_piece_name()])
 
     def __init__(self):
         # Declarations
@@ -41,6 +42,9 @@ class Chess:
 
     def get_default_piece_colors(self):
         return self.default_piece_colors
+
+    def get_default_piece_directions(self):
+        return self.default_piece_directions
 
     def get_piece_pos(self, piece):
         for row in range(len(self.board)):
