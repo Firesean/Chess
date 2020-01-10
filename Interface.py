@@ -64,7 +64,7 @@ class Interface:
                     move_able = piece.patterns.return_positions(piece, self.game)
             for move in move_able:
                 row, col = move
-                x, y = self.get_xy_with_col_row(row, col)
+                x, y = self.get_xy_with_col_row(col, row)
                 offset = self.get_offset()
 
                 self.current_moves.append(self.canvas.create_rectangle(x-offset,

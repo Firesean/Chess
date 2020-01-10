@@ -76,10 +76,10 @@ class Diagonal(MovementPattern):
         for quadrant in range(self.quadrant_corners):
             x_dir, y_dir = self.get_direction_of(quadrant, self.X_index), self.get_direction_of(quadrant, self.Y_index)
             for distance in range(1, self.max_distance + 1):
-                new_row, new_col = cur_row + distance * x_dir, cur_col + distance * y_dir
+                new_row, new_col = cur_row + distance * y_dir, cur_col + distance * x_dir
                 if self.is_movable(board, piece, new_row, new_col):
-                    move_able.append([new_col, new_row])
-                    if board.get_space(*move_able[-1][::-1]):
+                    move_able.append([new_row, new_col])
+                    if board.get_space(*move_able[-1]):
                         break
                 else:
                     break
@@ -102,8 +102,8 @@ class Horizontal(MovementPattern):
             for distance in range(1, self.max_distance + 1):
                 new_col = cur_col + distance * x_dir
                 if self.is_movable(board, piece, cur_row, new_col):
-                    move_able.append([new_col, cur_row])
-                    if board.get_space(*move_able[-1][::-1]):
+                    move_able.append([cur_row, new_col])
+                    if board.get_space(*move_able[-1]):
                         break
                 else:
                     break
@@ -125,9 +125,9 @@ class LJump(MovementPattern):
         for quadrant in range(self.quadrant_corners):
             x_dir, y_dir = self.get_direction_of(quadrant, self.X_index), self.get_direction_of(quadrant, self.Y_index)
             for move in moves:
-                new_row, new_col = cur_row + move[self.X_index]*x_dir, cur_col + move[self.Y_index]*y_dir
+                new_row, new_col = cur_row + move[self.X_index] * y_dir, cur_col + move[self.Y_index] * x_dir
                 if self.is_movable(board, piece, new_row, new_col):
-                    move_able.append([new_col, new_row])
+                    move_able.append([new_row, new_col])
         return move_able
 
 
@@ -151,8 +151,8 @@ class Vertical(MovementPattern):
             for distance in range(1, self.max_distance + 1):
                 new_row = cur_row + distance * y_dir
                 if self.is_movable(board, piece, new_row, cur_col):
-                    move_able.append([cur_col, new_row])
-                    if board.get_space(*move_able[-1][::-1]):
+                    move_able.append([new_row, cur_col])
+                    if board.get_space(*move_able[-1]):
                         break
                 else:
                     break
