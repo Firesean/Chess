@@ -60,6 +60,9 @@ class Pawn(Piece):
     def at_bench(self):
         return self.onBench
 
+    def off_bench(self):
+        self.onBench = False
+
 
 class Bishop(Piece):
     '''

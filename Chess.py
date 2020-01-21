@@ -20,6 +20,7 @@ class Chess:
         self.players = []
 
         # Main
+        self.move_able = []
         self.new_board()
         self.set_pieces()
         self.selected_piece = None
@@ -34,6 +35,9 @@ class Chess:
     def get_board_size(self):
         return self.board_size
 
+    def get_current_player(self):
+        return self.current_player
+
     def get_default_board_colors(self):
         return self.default_board_colors
 
@@ -45,6 +49,9 @@ class Chess:
 
     def get_default_piece_directions(self):
         return self.default_piece_directions
+
+    def get_move_able(self):
+        return self.move_able
 
     def get_piece_pos(self, piece):
         for row in range(len(self.board)):
@@ -65,6 +72,8 @@ class Chess:
 
     def move_piece_on_board(self, piece, row, col):
         old_row, old_col = self.get_piece_pos(piece)
+        if piece.get_piece_name() == Pawn().get_piece_name():
+            piece.off_bench()
         self.board[old_row][old_col] = None
         self.board[row][col] = piece
 
@@ -73,6 +82,9 @@ class Chess:
         for row in range(self.board_size):
             self.board.append([None])
             self.board[row] *= self.board_size
+
+    def set_move_able(self, move_able):
+        self.move_able = move_able
 
     def set_pieces(self):
         '''

@@ -43,7 +43,11 @@ class Interface:
 
     def controller(self, event):
         if self.selected:
+            # if self.selected.get_color() == self.game.get_current_player():
             self.move_piece(event)
+            # else:
+            #     self.selected = None
+            #     self.clear_movable()
         else:
             self.select_piece(event)
 
@@ -73,7 +77,8 @@ class Interface:
                                                                        y+offset,
                                                                        fill=self.game.get_default_movement_color()))
 
-                self.canvas.lift(self.piece_tag)
+            self.canvas.lift(self.piece_tag)
+            self.game.set_move_able(move_able)
         except AttributeError:
             print("No Patterns")
 
@@ -179,9 +184,12 @@ class Interface:
         if event:
             self.clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
+            if not [row, col] in self.game.get_move_able(): # Not a move able position
+                self.selected = None
+                return
             if self.movable_position(self.selected, row, col):
                 location = self.game.get_space(row, col)
-                x, y = self.get_xy_with_col_row(col, row)
+                x, y = self.get_xy_with_col_row(col, row) # Centers the position on the board
                 self.canvas.coords(self.selected.get_interface_ref(), x, y)
                 if location:
                     self.canvas.delete(location.get_interface_ref())

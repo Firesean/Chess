@@ -4,6 +4,9 @@ import Pieces
 class MovementPattern:
     X_index = 0
     Y_index = 1
+    row_index = 0
+    col_index = 1
+
 
     def __init__(self, quadrant_corners=2, max_distance=7):
         self.max_distance = max_distance
@@ -30,6 +33,12 @@ class MovementPattern:
         # Vertical : -1 = Up, 1 = Down using an index
         # Diagonal : -1, 1 = Top Left, 1, -1 = Bottom Right, 1, 1 = Top Right, -1, -1 = Bottom Left, using Both indexes
 
+    def get_max_distance(self):
+        return self.max_distance
+
+    def get_pattern_name(self):
+        return type(self).__name__
+
     def is_movable(self, board, piece, new_row, new_col):
         '''
         :param board:
@@ -44,22 +53,33 @@ class MovementPattern:
             return False
         elif space and space.get_color() == piece.get_color():  # Runs into same colored piece
             return False
-        # elif Pieces.Pawn().get_piece_name() == piece_type:
-        #     return self.is_valid_pawn_move(board, piece, new_col)
+        elif Pieces.Pawn().get_piece_name() == piece_type:
+            return self.is_valid_pawn_move(board, piece, new_col, new_row, self)
         # Other
         return True
 
-    def is_valid_pawn_move(self, board, piece, new_col):
-        piece_direction = board.get_default_piece_directions()[piece.get_color()]
-        y_pos = board.get_piece_pos(piece)[self.Y_index]
-        if piece_direction < 0: # White moving Up
-            if y_pos < new_col:
-                return True
-        else:
-            if y_pos > new_col:
-                return True
+    def is_valid_pawn_move(self, board, pawn, new_col, new_row, pattern):
+        piece_direction = board.get_default_piece_directions()[pawn.get_color()] # Up or Down
+        y_pos = board.get_piece_pos(pawn)[self.row_index] # Grabs position of piece
+        if piece_direction > 0: # Black moving Down
+            if y_pos < new_row:
+                return self.validate_pawn_move(board, pawn, new_col, new_row, pattern)
+        elif piece_direction < 0: # White moving Up
+            if y_pos > new_row:
+                return self.validate_pawn_move(board, pawn, new_col, new_row, pattern)
         return False
 
+    @staticmethod
+    def validate_pawn_move(board, pawn, new_col, new_row, pattern):
+        if pattern.get_pattern_name() == Vertical().get_pattern_name():
+            if pattern.get_max_distance() > 1 and not pawn.at_bench():
+                return False
+            elif board.get_space(new_row, new_col):
+                return False
+            return True
+        elif board.get_space(new_row, new_col) and pattern.get_pattern_name() == Diagonal().get_pattern_name():
+            return True
+        return False
 
 
 class Diagonal(MovementPattern):
@@ -78,6 +98,9 @@ class Diagonal(MovementPattern):
             for distance in range(1, self.max_distance + 1):
                 new_row, new_col = cur_row + distance * y_dir, cur_col + distance * x_dir
                 if self.is_movable(board, piece, new_row, new_col):
+                    if piece.get_piece_name() == Pieces.Pawn().get_piece_name():
+                        if not self.is_valid_pawn_move(board, piece, new_col, new_row, self):
+                            break
                     move_able.append([new_row, new_col])
                     if board.get_space(*move_able[-1]):
                         break
