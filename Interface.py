@@ -1,31 +1,34 @@
-import tkinter as tk
-
+from tkinter import *
+from PIL import Image, ImageTk
 
 class Interface:
+    background_image = Image.open(r"darkWood.png")
     board_tag = "board_tag"
+    canvas = None
+    contrast_color = "gray50"
+    current_moves = []
+    interface_start_pos = 2
     movement_tag = "movement"
     piece_tag = "piece"
-    interface_start_pos = 2
+    reference = []
+    selected = None
 
-    def __init__(self, game, window_size, root=tk.Tk()):
+
+    def __init__(self, game, window_size, root=Tk()):
         # Root
         self.root = root
-
         # Declarations
-        self.canvas = None
-        self.current_moves = []
+
         self.game = game
         self.icon_ref = "chessPicture.ICO"
-        self.reference = []
-        self.selected = None
         self.window_size = window_size
 
+
         # Main
-        self.draw_board()
-        self.draw_pieces()
+        self.background_image = self.background_image.resize((self.window_size, self.window_size), Image.ANTIALIAS)
+        self.background_photo = ImageTk.PhotoImage(self.background_image)
+        self.create_interface()
         self.set_binds()
-        self.root.title(type(game).__name__)
-        self.root.iconbitmap(self.icon_ref)
         self.root.mainloop()
 
     @staticmethod
@@ -36,7 +39,7 @@ class Interface:
     def calculate_interface_pos(index, spacer, offset):
         return index * spacer + offset
 
-    def clear_movable(self):
+    def display_clear_movable(self):
         for move in self.current_moves:
             self.canvas.delete(move)
         self.current_moves = []
@@ -50,6 +53,12 @@ class Interface:
             #     self.clear_movable()
         else:
             self.select_piece(event)
+
+    def create_interface(self):
+        self.draw_board()
+        self.draw_pieces()
+        self.root.title(type(self.game).__name__)
+        self.root.iconbitmap(self.icon_ref)
 
     def display_moves(self, piece):
         '''
@@ -75,7 +84,8 @@ class Interface:
                                                                        y-offset,
                                                                        x+offset,
                                                                        y+offset,
-                                                                       fill=self.game.get_default_movement_color()))
+                                                                       fill=self.game.get_default_movement_color(),
+                                                                       stipple=self.contrast_color))
 
             self.canvas.lift(self.piece_tag)
             self.game.set_move_able(move_able)
@@ -86,7 +96,8 @@ class Interface:
         '''
         Draws the design structure of the board as a grid and borders and *colors needed parts
         '''
-        self.canvas = tk.Canvas(height=self.window_size, width=self.window_size)
+        self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size)
+        self.canvas.create_image(0, 0, anchor=NW, image=self.background_photo)
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
         self.root.geometry("{0}x{0}".format(self.window_size+spacer))
@@ -110,7 +121,7 @@ class Interface:
                                      self.window_size,
                                      tags=self.board_tag)
 
-        self.canvas.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Centers the canvas in Root Window
+        self.canvas.place(relx=0.5, rely=0.5, anchor=CENTER)  # Centers the canvas in Root Window
         self.draw_squares()
         # Place an outline around board
 
@@ -149,7 +160,8 @@ class Interface:
                                              x + offset,
                                              y + offset,
                                              fill=color,
-                                             tags=self.board_tag)
+                                             tags=self.board_tag,
+                                             stipple=self.contrast_color)
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
@@ -182,7 +194,7 @@ class Interface:
         Checks if pieces can move and will move to selected position
         '''
         if event:
-            self.clear_movable()
+            self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
             if not [row, col] in self.game.get_move_able(): # Not a move able position
                 self.selected = None
