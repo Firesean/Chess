@@ -2,11 +2,13 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 class Interface:
-    background_image = Image.open(r"darkWood.png")
+    background_image = Image.open(r"images/darkWood.png")
     board_tag = "board_tag"
+    border_size = 0
     canvas = None
-    contrast_color = "gray50"
+    contrast_color = "gray50" # Used for transparency usage
     current_moves = []
+    indicator_display = None
     interface_start_pos = 2
     movement_tag = "movement"
     piece_tag = "piece"
@@ -20,7 +22,7 @@ class Interface:
         # Declarations
 
         self.game = game
-        self.icon_ref = "chessPicture.ICO"
+        self.icon_ref = "images/chessPicture.ICO"
         self.window_size = window_size
 
 
@@ -46,17 +48,21 @@ class Interface:
 
     def controller(self, event):
         if self.selected:
-            # if self.selected.get_color() == self.game.get_current_player():
-            self.move_piece(event)
-            # else:
-            #     self.selected = None
-            #     self.clear_movable()
+            if self.selected.get_color() == self.game.get_current_player():
+                self.move_piece(event)
+            else:
+                self.selected = None
+                self.display_clear_movable()
         else:
             self.select_piece(event)
 
     def create_interface(self):
         self.draw_board()
         self.draw_pieces()
+        indicator_size = self.get_offset() / 2
+        self.indicator_display = self.canvas.create_rectangle(0,0, indicator_size, indicator_size,
+                                                              fill=self.game.get_current_player())
+        self.root.resizable(width=False, height=False)
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
 
@@ -71,10 +77,9 @@ class Interface:
             if piece.patterns:
                 if isinstance(piece.patterns, tuple or list):
                     for pattern in piece.patterns:
-                        move = pattern.return_positions(piece, self.game)
-                        move_able += move
+                        move_able += self.game.get_pattern_positions(pattern, piece)
                 else:
-                    move_able = piece.patterns.return_positions(piece, self.game)
+                    move_able = self.game.get_pattern_positions(piece.patterns, piece)
             for move in move_able:
                 row, col = move
                 x, y = self.get_xy_with_col_row(col, row)
@@ -96,11 +101,11 @@ class Interface:
         '''
         Draws the design structure of the board as a grid and borders and *colors needed parts
         '''
-        self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size)
+        self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size, bd=self.border_size)
         self.canvas.create_image(0, 0, anchor=NW, image=self.background_photo)
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
-        self.root.geometry("{0}x{0}".format(self.window_size+spacer))
+        self.root.geometry("{0}x{0}".format(self.window_size))
         for line in range(board_size):
 
             self.canvas.create_line(self.interface_start_pos,
@@ -180,13 +185,13 @@ class Interface:
         x, y = self.calculate_interface_pos(col, spacer, offset), self.calculate_interface_pos(row, spacer, offset)
         return x, y
 
+    def move_indicator(self, event=None):
+        size = self.get_offset() / 2
+        offset = self.get_offset() / 4
+        self.canvas.coords(self.indicator_display, event.x+offset, event.y+offset, event.x+size+offset, event.y+size+offset)
+
     def movable_position(self, piece, row, col):
-        position = self.game.get_space(row, col)
-        if position and piece.get_color() == position.get_color():
-            return False
-        if not self.game.is_on_board(row, col):
-            return False
-        return True
+        return self.game.movable_position(piece, row, col)
 
     def move_piece(self, event=None):
         '''
@@ -206,6 +211,8 @@ class Interface:
                 if location:
                     self.canvas.delete(location.get_interface_ref())
                 self.game.move_piece_on_board(self.selected, row, col)
+                self.game.switch_player()
+                self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_player())
             self.selected = None
 
     def select_piece(self, event=None):
@@ -221,6 +228,7 @@ class Interface:
 
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
+        self.root.bind("<Motion>", lambda event: self.move_indicator(event))
 
 
 

@@ -13,6 +13,7 @@ class Chess:
                                                         Bishop().get_piece_name(), Queen().get_piece_name(),
                                                         King().get_piece_name(), Bishop().get_piece_name(),
                                                         Knight().get_piece_name(), Rook().get_piece_name()])
+    current_player = default_piece_colors[0]
 
     def __init__(self):
         # Declarations
@@ -53,6 +54,9 @@ class Chess:
     def get_move_able(self):
         return self.move_able
 
+    def get_pattern_positions(self, pattern, piece):
+        return pattern.return_positions(piece, self)
+
     def get_piece_pos(self, piece):
         for row in range(len(self.board)):
             if piece in self.board[row]:
@@ -69,6 +73,15 @@ class Chess:
         if row >= self.get_board_size() or col >= self.get_board_size():
             return False
         return True
+
+    def movable_position(self, piece, row, col):
+        position = self.get_space(row, col)
+        if position and piece.get_color() == position.get_color():
+            return False
+        if not self.is_on_board(row, col):
+            return False
+        return True
+
 
     def move_piece_on_board(self, piece, row, col):
         old_row, old_col = self.get_piece_pos(piece)
@@ -100,5 +113,9 @@ class Chess:
                     new_piece = self.create_piece(piece)
                     self.board[row][col] = new_piece
                     self.get_space(row, col).set_color(color)
+
+    def switch_player(self):
+        new_player = self.default_piece_colors.index(self.current_player) - 1
+        self.current_player = self.default_piece_colors[new_player]
 
 
