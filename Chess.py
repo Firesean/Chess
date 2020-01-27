@@ -1,23 +1,25 @@
-# import Players
+import Players
 from Pieces import *
 # https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
 
 
 class Chess:
-    default_board_colors = ["gray", "LightSalmon4"]
-    default_movement_color = "firebrick3"
-    default_piece_colors = ["Black", "White"]
-    default_piece_directions = {f"{default_piece_colors[0]}" : 1, f"{default_piece_colors[1]}" : -1} # Down = 1 , Up = 1
     board_size = 8
+    default_board_colors = ["gray", "LightSalmon4"]
     default_board_state = ([Pawn().get_piece_name()] + [Rook().get_piece_name(), Knight().get_piece_name(),
                                                         Bishop().get_piece_name(), Queen().get_piece_name(),
                                                         King().get_piece_name(), Bishop().get_piece_name(),
                                                         Knight().get_piece_name(), Rook().get_piece_name()])
+    default_movement_color = "firebrick3"
+    default_piece_colors = [Players.Player.black, Players.Player.white]
+    default_piece_directions = {f"{default_piece_colors[0]}" : 1, f"{default_piece_colors[1]}" : -1} # Down = 1 , Up = 1
     current_player = default_piece_colors[0]
 
     def __init__(self):
         # Declarations
         self.board = []
+        self.last_move = None
+        self.last_piece = None
         self.players = []
 
         # Main
