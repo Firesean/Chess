@@ -29,8 +29,8 @@ class MovementPattern:
         #            xy xy xy xy
         return int(str(quadrant[axis]).replace("0", "-1"))  # Returns the direction of item based on index given
         # Outputs
-        # Horizontal : 1 = Right, -1 = Left using an index
-        # Vertical : -1 = Up, 1 = Down using an index
+        # Horizontal : 1 = Right, -1 = Left using an X index
+        # Vertical : -1 = Up, 1 = Down using Y index
         # Diagonal : -1, 1 = Top Left, 1, -1 = Bottom Right, 1, 1 = Top Right, -1, -1 = Bottom Left, using Both indexes
 
     def get_max_distance(self):
@@ -107,6 +107,11 @@ class Diagonal(MovementPattern):
                 else:
                     break
         return move_able
+
+class DoubleJump(MovementPattern):
+
+    def return_positions(self, piece, game):
+        return Vertical(self.quadrant_corners, self.max_distance).return_positions(piece, game)
 
 class EnPassant(MovementPattern):
 
@@ -185,10 +190,6 @@ class Vertical(MovementPattern):
                     break
         return move_able
 
-class DoubleJump(MovementPattern):
-
-    def return_positions(self, piece, game):
-        return Vertical(self.quadrant_corners, self.max_distance).return_positions(piece, game)
 
 
 

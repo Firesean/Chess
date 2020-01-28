@@ -18,8 +18,7 @@ class Chess:
     def __init__(self):
         # Declarations
         self.board = []
-        self.last_move = None
-        self.last_piece = None
+        self.moves_made = []
         self.players = []
 
         # Main
@@ -28,9 +27,14 @@ class Chess:
         self.set_pieces()
         self.selected_piece = None
 
+    def append_to_moves_made(self, piece, row, col, old_row, old_col):
+        pass
+    # Grab the pieces patterns and determine which pattern was used
+    # Save it along with the distance taken to new position
+
     @staticmethod
-    def create_piece(piece):
-        return eval(f'{piece}()')
+    def create_piece(piece_name):
+        return eval(f'{piece_name}()')
 
     def get_board(self):
         return self.board
@@ -54,6 +58,20 @@ class Chess:
         return self.default_piece_directions
 
     def get_move_able(self):
+        return self.move_able
+
+    def get_moves(self, piece):
+        move_able = []
+        try:
+            if piece.patterns:
+                if isinstance(piece.patterns, tuple or list):
+                    for pattern in piece.patterns:
+                        move_able += self.get_pattern_positions(pattern, piece)
+                else:
+                    move_able = self.get_pattern_positions(piece.patterns, piece)
+            self.move_able = move_able
+        except AttributeError:
+            print("No Pattern")
         return self.move_able
 
     def get_pattern_positions(self, pattern, piece):
@@ -84,11 +102,11 @@ class Chess:
             return False
         return True
 
-
     def move_piece_on_board(self, piece, row, col):
         old_row, old_col = self.get_piece_pos(piece)
         if piece.get_piece_name() == Pawn().get_piece_name():
             piece.off_bench()
+        self.append_to_moves_made(piece, row, col, old_row, old_col)
         self.board[old_row][old_col] = None
         self.board[row][col] = piece
 
@@ -119,5 +137,23 @@ class Chess:
     def switch_player(self):
         new_player = self.default_piece_colors.index(self.current_player) - 1
         self.current_player = self.default_piece_colors[new_player]
+
+class PreviousMove:
+
+    def __init__(self, piece, pattern, old_row, old_col, new_row, new_col, captured=None):
+        self.captured = None
+        self.new_col = new_col
+        self.new_row = new_row
+        self.old_col = old_col
+        self.old_row = old_row
+        self.pattern = pattern
+        self.piece = piece
+
+    @staticmethod
+    def get_attribute(attribute):
+        try:
+            return eval(f"self.{attribute}")
+        except AttributeError:
+            return None
 
 

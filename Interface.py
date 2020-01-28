@@ -7,7 +7,7 @@ class Interface:
     border_size = 0
     canvas = None
     contrast_color = "gray50" # Used for transparency usage
-    current_moves = []
+    moves_displayed = []
     indicator_display = None
     interface_start_pos = 2
     movement_tag = "movement"
@@ -20,12 +20,9 @@ class Interface:
         # Root
         self.root = root
         # Declarations
-
         self.game = game
-        self.icon_ref = "images/chessPicture.ICO"
+        self.icon_ref = "images/chessicon.ICO"
         self.window_size = window_size
-
-
         # Main
         self.background_image = self.background_image.resize((self.window_size, self.window_size), Image.ANTIALIAS)
         self.background_photo = ImageTk.PhotoImage(self.background_image)
@@ -34,17 +31,12 @@ class Interface:
         self.root.mainloop()
 
     @staticmethod
-    def calculate_board_pos(pos, spacer, offset):
+    def calculate_board_pos(pos, spacer, offset): # Returns the position on the game board
         return int(((pos - offset) / spacer)+.5)
 
     @staticmethod
-    def calculate_interface_pos(index, spacer, offset):
+    def calculate_interface_pos(index, spacer, offset): # Returns the position on the interface
         return index * spacer + offset
-
-    def display_clear_movable(self):
-        for move in self.current_moves:
-            self.canvas.delete(move)
-        self.current_moves = []
 
     def controller(self, event):
         if self.selected:
@@ -66,36 +58,32 @@ class Interface:
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
 
+    def display_clear_movable(self):
+        for move in self.moves_displayed:
+            self.canvas.delete(move)
+        self.moves_displayed = []
+
     def display_moves(self, piece):
         '''
         :param piece:
         Goes through the pieces pattern's to show movable locations
         Displays the movable locations
         '''
-        move_able = []
-        try:
-            if piece.patterns:
-                if isinstance(piece.patterns, tuple or list):
-                    for pattern in piece.patterns:
-                        move_able += self.game.get_pattern_positions(pattern, piece)
-                else:
-                    move_able = self.game.get_pattern_positions(piece.patterns, piece)
-            for move in move_able:
-                row, col = move
-                x, y = self.get_xy_with_col_row(col, row)
-                offset = self.get_offset()
-
-                self.current_moves.append(self.canvas.create_rectangle(x-offset,
-                                                                       y-offset,
-                                                                       x+offset,
-                                                                       y+offset,
-                                                                       fill=self.game.get_default_movement_color(),
-                                                                       stipple=self.contrast_color))
-
+        move_able = self.get_moves(piece)
+        if not move_able: # Empty List
+            self.selected = None
+            return
+        for move in move_able:
+            row, col = move
+            x, y = self.get_xy_with_col_row(col, row)
+            offset = self.get_offset()
+            self.moves_displayed.append(self.canvas.create_rectangle(x-offset,
+                                                                    y-offset,
+                                                                    x+offset,
+                                                                    y+offset,
+                                                                    fill=self.game.get_default_movement_color(),
+                                                                    stipple=self.contrast_color))
             self.canvas.lift(self.piece_tag)
-            self.game.set_move_able(move_able)
-        except AttributeError:
-            print("No Patterns")
 
     def draw_board(self):
         '''
@@ -144,7 +132,7 @@ class Interface:
                     self.reference.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
                                                                   self.calculate_interface_pos(row, spacer, offset),
                                                                   text=piece.get_unicode(),
-                                                                  font="TimesNewRoman {}".format(offset),
+                                                                  font="comicsansms {}".format(offset),
                                                                   tags=self.piece_tag,
                                                                   fill=piece.get_color()))
                     piece.set_interface_ref(self.reference[-1])
@@ -168,13 +156,16 @@ class Interface:
                                              tags=self.board_tag,
                                              stipple=self.contrast_color)
 
-    def get_offset(self):
-        return int(self.get_spacer() / 2)
-
     def get_col_row_with_xy(self, x, y):
         spacer = self.get_spacer()
         offset = self.get_offset()
         return self.calculate_board_pos(x, spacer, offset), self.calculate_board_pos(y, spacer, offset)
+
+    def get_moves(self, piece):
+        return self.game.get_moves(piece)
+
+    def get_offset(self):
+        return int(self.get_spacer() / 2)
 
     def get_spacer(self):
         return int(self.window_size / self.game.get_board_size())
