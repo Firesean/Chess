@@ -12,7 +12,7 @@ class Interface:
     interface_start_pos = 2
     movement_tag = "movement"
     piece_tag = "piece"
-    reference = []
+    references = []
     selected = None
 
 
@@ -73,16 +73,18 @@ class Interface:
         if not move_able: # Empty List
             self.selected = None
             return
-        for move in move_able:
-            row, col = move
-            x, y = self.get_xy_with_col_row(col, row)
-            offset = self.get_offset()
-            self.moves_displayed.append(self.canvas.create_rectangle(x-offset,
-                                                                    y-offset,
-                                                                    x+offset,
-                                                                    y+offset,
-                                                                    fill=self.game.get_default_movement_color(),
-                                                                    stipple=self.contrast_color))
+        for path in move_able:
+            moves = move_able[path]
+            for move in moves:
+                row, col = move
+                x, y = self.get_xy_with_col_row(col, row)
+                offset = self.get_offset()
+                self.moves_displayed.append(self.canvas.create_rectangle(x-offset,
+                                                                        y-offset,
+                                                                        x+offset,
+                                                                        y+offset,
+                                                                        fill=self.game.get_default_movement_color(),
+                                                                        stipple=self.contrast_color))
             self.canvas.lift(self.piece_tag)
 
     def draw_board(self):
@@ -129,13 +131,13 @@ class Interface:
             for piece in row:
                 if piece:
                     row, col = self.game.get_piece_pos(piece)
-                    self.reference.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
-                                                                  self.calculate_interface_pos(row, spacer, offset),
-                                                                  text=piece.get_unicode(),
-                                                                  font="comicsansms {}".format(offset),
-                                                                  tags=self.piece_tag,
-                                                                  fill=piece.get_color()))
-                    piece.set_interface_ref(self.reference[-1])
+                    self.references.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
+                                                                   self.calculate_interface_pos(row, spacer, offset),
+                                                                   text=piece.get_unicode(),
+                                                                   font="comicsansms {}".format(offset),
+                                                                   tags=self.piece_tag,
+                                                                   fill=piece.get_color()))
+                    piece.set_interface_ref(self.references[-1])
 
     def draw_squares(self):
         board_size = self.game.get_board_size()
@@ -192,7 +194,7 @@ class Interface:
         if event:
             self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            if not [row, col] in self.game.get_move_able(): # Not a move able position
+            if not self.game.move_in_dict([row, col], self.game.get_move_able()):
                 self.selected = None
                 return
             if self.movable_position(self.selected, row, col):

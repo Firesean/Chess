@@ -22,7 +22,7 @@ class Chess:
         self.players = []
 
         # Main
-        self.move_able = []
+        self.move_able = {}
         self.new_board()
         self.set_pieces()
         self.selected_piece = None
@@ -61,14 +61,14 @@ class Chess:
         return self.move_able
 
     def get_moves(self, piece):
-        move_able = []
+        move_able = {}
         try:
             if piece.patterns:
                 if isinstance(piece.patterns, tuple or list):
                     for pattern in piece.patterns:
-                        move_able += self.get_pattern_positions(pattern, piece)
+                        move_able[f"{pattern}"] = self.get_pattern_positions(pattern, piece)
                 else:
-                    move_able = self.get_pattern_positions(piece.patterns, piece)
+                    move_able[f"{piece.patterns}"] = self.get_pattern_positions(piece.patterns, piece)
             self.move_able = move_able
         except AttributeError:
             print("No Pattern")
@@ -101,6 +101,15 @@ class Chess:
         if not self.is_on_board(row, col):
             return False
         return True
+
+    @staticmethod
+    def move_in_dict(move , moves):
+        for key, value in moves.items():
+            if not move in value: # Not a move able position
+                continue
+            else:
+                return True
+        return False
 
     def move_piece_on_board(self, piece, row, col):
         old_row, old_col = self.get_piece_pos(piece)
@@ -141,7 +150,7 @@ class Chess:
 class PreviousMove:
 
     def __init__(self, piece, pattern, old_row, old_col, new_row, new_col, captured=None):
-        self.captured = None
+        self.captured = captured
         self.new_col = new_col
         self.new_row = new_row
         self.old_col = old_col
