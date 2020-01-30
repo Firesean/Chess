@@ -194,7 +194,8 @@ class Interface:
         if event:
             self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            if not self.game.move_in_dict([row, col], self.game.get_move_able()):
+            pattern = self.game.get_move_pattern([row, col], self.game.get_move_able())
+            if not pattern:
                 self.selected = None
                 return
             if self.movable_position(self.selected, row, col):
@@ -203,7 +204,7 @@ class Interface:
                 self.canvas.coords(self.selected.get_interface_ref(), x, y)
                 if location:
                     self.canvas.delete(location.get_interface_ref())
-                self.game.move_piece_on_board(self.selected, row, col)
+                self.game.move_piece_on_board(self.selected, pattern, row, col, location)
                 self.game.switch_player()
                 self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_player())
             self.selected = None

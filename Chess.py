@@ -27,8 +27,9 @@ class Chess:
         self.set_pieces()
         self.selected_piece = None
 
-    def append_to_moves_made(self, piece, row, col, old_row, old_col):
-        pass
+    def append_to_moves_made(self, piece, pattern, row, col, old_row, old_col, captured=None):
+        self.moves_made.append(PreviousMove(piece, pattern, row, col, old_row, old_col, captured))
+        self.moves_made[-1].display_all()
     # Grab the pieces patterns and determine which pattern was used
     # Save it along with the distance taken to new position
 
@@ -59,6 +60,15 @@ class Chess:
 
     def get_move_able(self):
         return self.move_able
+
+    @staticmethod
+    def get_move_pattern(move, moves):
+        for key, value in moves.items():
+            if not move in value: # Not a move able position
+                continue
+            else:
+                return key
+        return False
 
     def get_moves(self, piece):
         move_able = {}
@@ -102,20 +112,11 @@ class Chess:
             return False
         return True
 
-    @staticmethod
-    def move_in_dict(move , moves):
-        for key, value in moves.items():
-            if not move in value: # Not a move able position
-                continue
-            else:
-                return True
-        return False
-
-    def move_piece_on_board(self, piece, row, col):
+    def move_piece_on_board(self, piece, pattern, row, col, captured=None):
         old_row, old_col = self.get_piece_pos(piece)
         if piece.get_piece_name() == Pawn().get_piece_name():
             piece.off_bench()
-        self.append_to_moves_made(piece, row, col, old_row, old_col)
+        self.append_to_moves_made(piece, pattern, row, col, old_row, old_col, captured)
         self.board[old_row][old_col] = None
         self.board[row][col] = piece
 
@@ -158,11 +159,15 @@ class PreviousMove:
         self.pattern = pattern
         self.piece = piece
 
-    @staticmethod
-    def get_attribute(attribute):
-        try:
-            return eval(f"self.{attribute}")
-        except AttributeError:
-            return None
+    def display_all(self):
+        print(f'''
+        Captured : {self.captured}
+        New Row : {self.new_row}
+        New Col : {self.new_col}
+        Old Row : {self.old_row}
+        Old Col : {self.old_col}
+        Pattern : {self.pattern}
+        Piece : {self.piece}
+        ''')
 
 

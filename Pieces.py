@@ -55,7 +55,7 @@ class Pawn(Piece):
     Must switch piece type if reaches opponents edge,
     '''
     onBench = True
-    patterns = Pattern.DoubleJump(2, 2), Pattern.Diagonal(4, 1), Pattern.Vertical(2, 1)
+    patterns = Pattern.Diagonal(4, 1), Pattern.Vertical(2, 1), Pattern.DoubleJump(2, 2)
 
     def at_bench(self):
         return self.onBench
