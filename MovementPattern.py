@@ -99,7 +99,7 @@ class Diagonal(MovementPattern):
                 new_row, new_col = cur_row + distance * col_dir, cur_col + distance * row_dir
                 if self.is_movable(game, piece, new_row, new_col):
                     if piece.get_piece_name() == Pieces.Pawn().get_piece_name():
-                        if not self.is_valid_pawn_move(game, piece, new_col, new_row, self):
+                        if not self.is_valid_pawn_move(game, piece, new_row, new_col, self):
                             break
                     move_able.append([new_row, new_col])
                     if game.get_space(*move_able[-1]):

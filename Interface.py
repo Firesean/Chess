@@ -2,7 +2,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 class Interface:
-    background_image = Image.open(r"images/darkWood.png")
+    background_image = Image.open(r"images/mariobackground.png")
     board_tag = "board_tag"
     border_size = 0
     canvas = None
