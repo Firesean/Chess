@@ -28,8 +28,7 @@ class Chess:
         self.selected_piece = None
 
     def append_to_moves_made(self, piece, pattern, row, col, old_row, old_col, captured=None):
-        self.moves_made.append(PreviousMove(piece, pattern, row, col, old_row, old_col, captured))
-        self.moves_made[-1].display_all()
+        self.moves_made.append(PreviousMove(piece, pattern, old_row, old_col, row, col, captured))
     # Grab the pieces patterns and determine which pattern was used
     # Save it along with the distance taken to new position
 
@@ -58,6 +57,10 @@ class Chess:
     def get_default_piece_directions(self):
         return self.default_piece_directions
 
+    def get_last_move_made(self):
+        if len(self.moves_made) != 0:
+            return self.moves_made[-1]
+
     def get_move_able(self):
         return self.move_able
 
@@ -67,21 +70,18 @@ class Chess:
             if not move in value: # Not a move able position
                 continue
             else:
-                return key
+                return key # Returns pattern name
         return False
 
     def get_moves(self, piece):
         move_able = {}
-        try:
-            if piece.patterns:
-                if isinstance(piece.patterns, tuple or list):
-                    for pattern in piece.patterns:
-                        move_able[f"{pattern}"] = self.get_pattern_positions(pattern, piece)
-                else:
-                    move_able[f"{piece.patterns}"] = self.get_pattern_positions(piece.patterns, piece)
-            self.move_able = move_able
-        except AttributeError:
-            print("No Pattern")
+        if piece.patterns:
+            if isinstance(piece.patterns, tuple or list):
+                for pattern in piece.patterns:
+                    move_able[f"{pattern}"] = self.get_pattern_positions(pattern, piece)
+            else:
+                move_able[f"{piece.patterns}"] = self.get_pattern_positions(piece.patterns, piece)
+        self.move_able = move_able
         return self.move_able
 
     def get_pattern_positions(self, pattern, piece):
@@ -170,4 +170,9 @@ class PreviousMove:
         Piece : {self.piece}
         ''')
 
+    def get_pattern_used(self):
+        return self.pattern
+
+    def get_piece_used(self):
+        return self.piece
 

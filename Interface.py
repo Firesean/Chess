@@ -181,7 +181,8 @@ class Interface:
     def move_indicator(self, event=None):
         size = self.get_offset() / 2
         offset = self.get_offset() / 4
-        self.canvas.coords(self.indicator_display, event.x+offset, event.y+offset, event.x+size+offset, event.y+size+offset)
+        x_pos, y_pos = event.x + offset, event.y + offset
+        self.canvas.coords(self.indicator_display, x_pos, y_pos, x_pos+size, y_pos+size)
 
     def movable_position(self, piece, row, col):
         return self.game.movable_position(piece, row, col)
