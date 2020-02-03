@@ -1,8 +1,9 @@
 from tkinter import *
 from PIL import Image, ImageTk
+import MovementPattern as Pattern
 
 class Interface:
-    background_image = Image.open(r"images/mariobackground.png")
+    background_image = Image.open(r"images/retro.png")
     board_tag = "board_tag"
     border_size = 0
     canvas = None
@@ -195,8 +196,8 @@ class Interface:
         if event:
             self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            pattern = self.game.get_move_pattern([row, col], self.game.get_move_able())
-            if not pattern:
+            pattern_name = self.game.get_move_pattern([row, col], self.game.get_move_able())
+            if not pattern_name:
                 self.selected = None
                 return
             if self.movable_position(self.selected, row, col):
@@ -205,7 +206,10 @@ class Interface:
                 self.canvas.coords(self.selected.get_interface_ref(), x, y)
                 if location:
                     self.canvas.delete(location.get_interface_ref())
-                self.game.move_piece_on_board(self.selected, pattern, row, col, location)
+                self.game.move_piece_on_board(self.selected, pattern_name, row, col, location)
+                last_move = self.game.get_last_move_made()
+                if Pattern.EnPassant().get_pattern_name() in last_move.get_pattern_used():
+                    self.canvas.delete(last_move.get_captured().get_interface_ref())
                 self.game.switch_player()
                 self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_player())
             self.selected = None

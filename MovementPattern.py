@@ -2,8 +2,8 @@ import Pieces
 
 
 class MovementPattern:
-    row_index = 0 # X
-    col_index = 1 # Y
+    row_index = 0
+    col_index = 1
 
 
     def __init__(self, quadrant_corners=2, max_distance=7):
@@ -117,7 +117,8 @@ class EnPassant(MovementPattern):
 
     def return_positions(self, piece, game):
         move_able = []
-        if game.get_last_move_made():
+        last_move =  game.get_last_move_made()
+        if not last_move.is_default():
             last_move = game.get_last_move_made()
             other_piece = last_move.get_piece_used()
             if other_piece.get_color() == piece.get_color():
@@ -125,13 +126,11 @@ class EnPassant(MovementPattern):
             if DoubleJump().get_pattern_name() in last_move.get_pattern_used():
                 piece_direction = game.get_default_piece_directions()[piece.get_color()]
                 if self.is_adjacent(game, piece, other_piece):
-                    print("Working")
+                    other_piece_pos = game.get_piece_pos(other_piece)
                     if piece_direction > 0:  # Black moving Down
-                            # add to movable to move behind it
-                            pass
+                        move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
                     elif piece_direction < 0:  # White moving Up
-                            # add to movable to move behind it
-                        pass
+                        move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
         return move_able
 
     def is_adjacent(self, game, piece, other_piece):

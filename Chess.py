@@ -27,8 +27,8 @@ class Chess:
         self.set_pieces()
         self.selected_piece = None
 
-    def append_to_moves_made(self, piece, pattern, row, col, old_row, old_col, captured=None):
-        self.moves_made.append(PreviousMove(piece, pattern, old_row, old_col, row, col, captured))
+    def append_to_moves_made(self, piece, pattern_name, row, col, old_row, old_col, captured=None):
+        self.moves_made.append(PreviousMove(piece, pattern_name, old_row, old_col, row, col, captured))
     # Grab the pieces patterns and determine which pattern was used
     # Save it along with the distance taken to new position
 
@@ -60,6 +60,7 @@ class Chess:
     def get_last_move_made(self):
         if len(self.moves_made) != 0:
             return self.moves_made[-1]
+        return PreviousMove()
 
     def get_move_able(self):
         return self.move_able
@@ -112,11 +113,19 @@ class Chess:
             return False
         return True
 
-    def move_piece_on_board(self, piece, pattern, row, col, captured=None):
+    def move_piece_on_board(self, piece, pattern_name, row, col, captured=None):
         old_row, old_col = self.get_piece_pos(piece)
         if piece.get_piece_name() == Pawn().get_piece_name():
             piece.off_bench()
-        self.append_to_moves_made(piece, pattern, row, col, old_row, old_col, captured)
+            # If last move as EnPassant
+
+            if Pattern.EnPassant().get_pattern_name() in pattern_name:
+                piece_direction = self.get_default_piece_directions()[piece.get_color()]
+                captured = self.get_space(row-piece_direction, col)
+                self.board[row-piece_direction][col] = None
+
+
+        self.append_to_moves_made(piece, pattern_name, row, col, old_row, old_col, captured)
         self.board[old_row][old_col] = None
         self.board[row][col] = piece
 
@@ -150,13 +159,13 @@ class Chess:
 
 class PreviousMove:
 
-    def __init__(self, piece, pattern, old_row, old_col, new_row, new_col, captured=None):
+    def __init__(self, piece=None, pattern_name="", old_row=0, old_col=0, new_row=0, new_col=0, captured=None):
         self.captured = captured
         self.new_col = new_col
         self.new_row = new_row
         self.old_col = old_col
         self.old_row = old_row
-        self.pattern = pattern
+        self.pattern_name = pattern_name
         self.piece = piece
 
     def display_all(self):
@@ -166,13 +175,22 @@ class PreviousMove:
         New Col : {self.new_col}
         Old Row : {self.old_row}
         Old Col : {self.old_col}
-        Pattern : {self.pattern}
+        Pattern : {self.pattern_name}
         Piece : {self.piece}
         ''')
 
+    def get_captured(self):
+        return self.captured
+
     def get_pattern_used(self):
-        return self.pattern
+        if self.pattern_name:
+            return self.pattern_name
 
     def get_piece_used(self):
         return self.piece
+
+    def is_default(self):
+        if [self.old_row, self.old_col] == [self.new_row, self.new_col]:
+            return True
+        return False
 
