@@ -4,15 +4,15 @@ import MovementPattern as Pattern
 
 class Interface:
     background_image = Image.open(r"images/retro.png")
-    board_tag = "board_tag"
+    board_tag = "board_tag" # Used order canvas items
     border_size = 0
     canvas = None
     contrast_color = "gray50" # Used for transparency usage
     moves_displayed = []
     indicator_display = None
     interface_start_pos = 2
-    movement_tag = "movement"
-    piece_tag = "piece"
+    movement_tag = "movement" # Used order canvas items
+    piece_tag = "piece" # Used order canvas items
     references = []
     selected = None
 
@@ -43,9 +43,11 @@ class Interface:
         if self.selected:
             if self.selected.get_color() == self.game.get_current_player():
                 self.move_piece(event)
+
             else:
                 self.selected = None
                 self.display_clear_movable()
+
         else:
             self.select_piece(event)
 
@@ -62,6 +64,7 @@ class Interface:
     def display_clear_movable(self):
         for move in self.moves_displayed:
             self.canvas.delete(move)
+
         self.moves_displayed = []
 
     def display_moves(self, piece):
@@ -97,6 +100,7 @@ class Interface:
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
         self.root.geometry("{0}x{0}".format(self.window_size))
+
         for line in range(board_size):
 
             self.canvas.create_line(self.interface_start_pos,
@@ -130,6 +134,7 @@ class Interface:
         offset = self.get_offset()
         for row in board:
             for piece in row:
+
                 if piece:
                     row, col = self.game.get_piece_pos(piece)
                     self.references.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
@@ -148,6 +153,7 @@ class Interface:
             for col in range(board_size):
                 x, y = self.get_xy_with_col_row(col, row)
                 color = colors[0]
+
                 if row % 2 == col % 2:
                     color = colors[1]
 
@@ -196,22 +202,33 @@ class Interface:
         if event:
             self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            pattern_name = self.game.get_move_pattern([row, col], self.game.get_move_able())
+            # Determines if possible Moves # Deselects if none
+            pattern_name = self.game.get_move_pattern([row, col], self.game.get_move_able()) # If Any positions are possible
             if not pattern_name:
                 self.selected = None
                 return
+
+            # Sets piece position on interface
             if self.movable_position(self.selected, row, col):
                 location = self.game.get_space(row, col)
                 x, y = self.get_xy_with_col_row(col, row) # Centers the position on the board
                 self.canvas.coords(self.selected.get_interface_ref(), x, y)
+
+                # Deletes piece if captured
                 if location:
                     self.canvas.delete(location.get_interface_ref())
+
+
                 self.game.move_piece_on_board(self.selected, pattern_name, row, col, location)
                 last_move = self.game.get_last_move_made()
+
+                # Checks for EnPassant
                 if Pattern.EnPassant().get_pattern_name() in last_move.get_pattern_used():
                     self.canvas.delete(last_move.get_captured().get_interface_ref())
+
                 self.game.switch_player()
                 self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_player())
+
             self.selected = None
 
     def select_piece(self, event=None):

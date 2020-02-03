@@ -105,6 +105,8 @@ class Chess:
             return False
         return True
 
+
+
     def movable_position(self, piece, row, col):
         position = self.get_space(row, col)
         if position and piece.get_color() == position.get_color():
@@ -117,6 +119,8 @@ class Chess:
         old_row, old_col = self.get_piece_pos(piece)
         if piece.get_piece_name() == Pawn().get_piece_name():
             piece.off_bench()
+        elif piece.get_piece_name() == King().get_piece_name():
+            piece.move_king()
             # If last move as EnPassant
 
             if Pattern.EnPassant().get_pattern_name() in pattern_name:

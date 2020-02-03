@@ -130,8 +130,11 @@ class King(Piece):
     def get_in_check(self):
         return self.inCheck
 
-    def has_moved(self):
+    def is_moved(self):
         return self.moved
+
+    def move_king(self):
+        self.moved = True
 
     # Moves any direction by one square
     # If King hasn't been in check and moved it can do a movement to left or right by 2 squares

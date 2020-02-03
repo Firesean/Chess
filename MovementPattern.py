@@ -80,7 +80,12 @@ class MovementPattern:
         return False
 
 class Castling(MovementPattern):
-    pass
+
+    def return_positions(self, piece, game):
+        move_able = []
+        if self:
+            pass
+        return move_able
 
 class Diagonal(MovementPattern):
 
@@ -198,10 +203,16 @@ class Vertical(MovementPattern):
         # Refer to get_direction_of for understanding of the algorithm below
         for quadrant in range(self.quadrant_corners):
             y_dir = self.get_direction_of(quadrant, self.col_index)
+
             if piece.get_piece_name() == Pieces.Pawn().get_piece_name():
                 piece_direction = game.get_default_piece_directions()[piece.get_color()]
                 if piece_direction != y_dir:
                     continue
+
+            elif piece.get_piece_name() == Pieces.King().get_piece_name():
+                if not piece.has_moved(): # Haven't Moved
+                    pass
+
             for distance in range(1, self.max_distance + 1):
                 new_row = cur_row + distance * y_dir
                 if self.is_movable(game, piece, new_row, cur_col):
