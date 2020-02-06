@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 import MovementPattern as Pattern
 
 class Interface:
-    background_image = Image.open(r"images/retro.png")
+    background_image = Image.open(r"images/darkWood.png")
     board_tag = "board_tag" # Used order canvas items
     border_size = 0
     canvas = None

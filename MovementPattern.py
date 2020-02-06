@@ -83,8 +83,13 @@ class Castling(MovementPattern):
 
     def return_positions(self, piece, game):
         move_able = []
-        if self:
-            pass
+        if piece.moved:
+            return move_able
+        # Check both rooks if moved
+        piece_row_pos = game.get_piece_pos(piece)[self.row_index]
+        # 0 Index and Board Size - 1 Index for Rooks
+        # Check if spaces in between
+        # Return king's directions if can move
         return move_able
 
 class Diagonal(MovementPattern):
@@ -124,18 +129,13 @@ class EnPassant(MovementPattern):
         move_able = []
         last_move =  game.get_last_move_made()
         if not last_move.is_default():
-            last_move = game.get_last_move_made()
             other_piece = last_move.get_piece_used()
-            if other_piece.get_color() == piece.get_color():
-                return move_able
-            if DoubleJump().get_pattern_name() in last_move.get_pattern_used():
+            if DoubleJump().get_pattern_name() in last_move.get_pattern_used(): # Is Double jump
                 piece_direction = game.get_default_piece_directions()[piece.get_color()]
                 if self.is_adjacent(game, piece, other_piece):
                     other_piece_pos = game.get_piece_pos(other_piece)
-                    if piece_direction > 0:  # Black moving Down
-                        move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
-                    elif piece_direction < 0:  # White moving Up
-                        move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
+                    move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
+
         return move_able
 
     def is_adjacent(self, game, piece, other_piece):
@@ -210,7 +210,7 @@ class Vertical(MovementPattern):
                     continue
 
             elif piece.get_piece_name() == Pieces.King().get_piece_name():
-                if not piece.has_moved(): # Haven't Moved
+                if not piece.is_moved(): # Haven't Moved
                     pass
 
             for distance in range(1, self.max_distance + 1):

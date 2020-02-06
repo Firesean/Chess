@@ -125,7 +125,7 @@ class King(Piece):
     # Value : inf
     inCheck = False
     moved = False
-    patterns = Pattern.Vertical(2, 1), Pattern.Horizontal(2, 1), Pattern.Diagonal(4, 1)
+    patterns = Pattern.Vertical(2, 1), Pattern.Horizontal(2, 1), Pattern.Diagonal(4, 1), Pattern.Castling(4, 2)
 
     def get_in_check(self):
         return self.inCheck

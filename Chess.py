@@ -11,7 +11,7 @@ class Chess:
                                                         King().get_piece_name(), Bishop().get_piece_name(),
                                                         Knight().get_piece_name(), Rook().get_piece_name()])
     default_movement_color = "firebrick3"
-    default_piece_colors = [Players.Player.black, Players.Player.white]
+    default_piece_colors = [Players.Player.white, Players.Player.black]
     default_piece_directions = {f"{default_piece_colors[0]}" : 1, f"{default_piece_colors[1]}" : -1} # Down = 1 , Up = 1
     current_player = default_piece_colors[0]
 
@@ -123,10 +123,10 @@ class Chess:
             piece.move_king()
             # If last move as EnPassant
 
-            if Pattern.EnPassant().get_pattern_name() in pattern_name:
-                piece_direction = self.get_default_piece_directions()[piece.get_color()]
-                captured = self.get_space(row-piece_direction, col)
-                self.board[row-piece_direction][col] = None
+        if Pattern.EnPassant().get_pattern_name() in pattern_name:
+            piece_direction = self.get_default_piece_directions()[piece.get_color()]
+            captured = self.get_space(row-piece_direction, col)
+            self.board[row-piece_direction][col] = None
 
 
         self.append_to_moves_made(piece, pattern_name, row, col, old_row, old_col, captured)
