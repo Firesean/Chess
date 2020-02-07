@@ -83,11 +83,30 @@ class Castling(MovementPattern):
 
     def return_positions(self, piece, game):
         move_able = []
+        rooks = []
         if piece.moved:
             return move_able
         # Check both rooks if moved
-        piece_row_pos = game.get_piece_pos(piece)[self.row_index]
-        # 0 Index and Board Size - 1 Index for Rooks
+        piece_pos = game.get_piece_pos(piece)
+        # Col : 0 Index and Board Size - 1 Index for Rooks
+        for col in [0, game.get_board_size() - 1]:
+            other_piece = game.get_space(piece_pos[self.row_index], col)
+            if other_piece and other_piece.get_piece_name() == Pieces.Rook().get_piece_name():
+                rooks.append(other_piece)
+        for rook in rooks:
+            rook_moves = game.get_moves(rook)
+            print(rook_moves)
+            spaces_between = [rook_moves[pattern] for pattern in rook_moves if pattern[self.row_index] == piece_pos[self.row_index]]
+            print(spaces_between)
+
+            if len(spaces_between) == abs(piece_pos[self.col_index] - game.get_piece_pos(rook)[self.col_index]):
+                print("True")
+            else:
+                print("False")
+
+
+
+
         # Check if spaces in between
         # Return king's directions if can move
         return move_able
