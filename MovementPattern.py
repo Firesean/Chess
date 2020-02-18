@@ -81,30 +81,47 @@ class MovementPattern:
 
 class Castling(MovementPattern):
 
+    # Has he moved
+    # piece COL
+    # Rook COL - Piece
+    # Range piece Col+1 Rook COL
+    # IF THERE IS A PIECE BETWEEN
+    # RETURN FALSE
+    # Else
+    # TRUE
+    # Next Rook
+    # Your king must not pass through a square that is under attack by enemy pieces;
+    # The king must not end up in check.
+
     def return_positions(self, piece, game):
         move_able = []
         rooks = []
         if piece.moved:
             return move_able
-        # Check both rooks if moved
         piece_pos = game.get_piece_pos(piece)
         # Col : 0 Index and Board Size - 1 Index for Rooks
         for col in [0, game.get_board_size() - 1]:
             other_piece = game.get_space(piece_pos[self.row_index], col)
             if other_piece and other_piece.get_piece_name() == Pieces.Rook().get_piece_name():
+                # Has rook moved and check for matching colors
                 rooks.append(other_piece)
         for rook in rooks:
-            rook_moves = game.get_moves(rook)
-            print(rook_moves)
-            spaces_between = [rook_moves[pattern] for pattern in rook_moves if pattern[self.row_index] == piece_pos[self.row_index]]
-            print(spaces_between)
+            rook_patterns = game.get_pattern_and_moves(rook)
+            spaces_between = []
+            for pattern in rook_patterns:
+                for move in rook_patterns[pattern]:
+                    if move[self.row_index] == piece_pos[self.row_index]:
+                        spaces_between.append(move)
+                for move in spaces_between:
+                    if move: # Check if move would be through check
+                        break
+                else: # Not through check
+                    pass
 
-            if len(spaces_between) == abs(piece_pos[self.col_index] - game.get_piece_pos(rook)[self.col_index]):
+            if len(spaces_between) + 1 == abs(piece_pos[self.col_index] - game.get_piece_pos(rook)[self.col_index]):
                 print("True")
             else:
                 print("False")
-
-
 
 
         # Check if spaces in between

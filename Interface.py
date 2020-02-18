@@ -2,6 +2,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 import MovementPattern as Pattern
 
+
 class Interface:
     background_image = Image.open(r"images/darkWood.png")
     board_tag = "board_tag" # Used order canvas items
@@ -12,6 +13,9 @@ class Interface:
     indicator_display = None
     interface_start_pos = 2
     movement_tag = "movement" # Used order canvas items
+    pixels_dropped = -15 # Pixels to the bottom
+    pixels_slided = 0 # Pixels to the left
+    piece_indicator = None
     piece_tag = "piece" # Used order canvas items
     references = []
     selected = None
@@ -41,13 +45,12 @@ class Interface:
 
     def controller(self, event):
         if self.selected:
+            self.de_indicate_piece(self.selected)
             if self.selected.get_color() == self.game.get_current_player():
                 self.move_piece(event)
-
             else:
                 self.selected = None
                 self.display_clear_movable()
-
         else:
             self.select_piece(event)
 
@@ -61,6 +64,11 @@ class Interface:
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
 
+    def de_indicate_piece(self, piece):
+        ref = piece.get_interface_ref()
+        self.canvas.move(ref, -1*self.pixels_slided, -1*self.pixels_dropped)
+        self.canvas.delete(self.piece_indicator)
+
     def display_clear_movable(self):
         for move in self.moves_displayed:
             self.canvas.delete(move)
@@ -73,10 +81,12 @@ class Interface:
         Goes through the pieces pattern's to show movable locations
         Displays the movable locations
         '''
-        move_able = self.get_moves(piece)
+        move_able = self.get_pattern_and_moves(piece)
         if not move_able: # Empty List
             self.selected = None
             return
+        color = self.game.get_default_movement_color()
+        # color = "cyan"
         for path in move_able:
             moves = move_able[path]
             for move in moves:
@@ -87,7 +97,7 @@ class Interface:
                                                                         y-offset,
                                                                         x+offset,
                                                                         y+offset,
-                                                                        fill=self.game.get_default_movement_color(),
+                                                                        fill=color,
                                                                         stipple=self.contrast_color))
             self.canvas.lift(self.piece_tag)
 
@@ -170,8 +180,8 @@ class Interface:
         offset = self.get_offset()
         return self.calculate_board_pos(x, spacer, offset), self.calculate_board_pos(y, spacer, offset)
 
-    def get_moves(self, piece):
-        return self.game.get_moves(piece)
+    def get_pattern_and_moves(self, piece):
+        return self.game.get_pattern_and_moves(piece)
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
@@ -184,6 +194,15 @@ class Interface:
         offset = self.get_offset()
         x, y = self.calculate_interface_pos(col, spacer, offset), self.calculate_interface_pos(row, spacer, offset)
         return x, y
+
+    def indicate_piece(self, piece):
+        ref = piece.get_interface_ref()
+        offset = self.get_offset() / 2
+        x, y = self.canvas.coords(ref)
+        self.piece_indicator = self.canvas.create_oval(x+offset,y+offset,
+                                                       x-offset,y+offset + offset/self.game.get_board_size())
+        self.canvas.move(ref, self.pixels_slided, self.pixels_dropped)
+
 
     def move_indicator(self, event=None):
         size = self.get_offset() / 2
@@ -241,6 +260,7 @@ class Interface:
             self.selected = self.game.get_space(row, col)
             if self.selected:
                 self.display_moves(self.selected)
+                self.indicate_piece(self.selected)
 
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))

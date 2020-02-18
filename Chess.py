@@ -12,7 +12,8 @@ class Chess:
                                                         Knight().get_piece_name(), Rook().get_piece_name()])
     default_movement_color = "firebrick3"
     default_piece_colors = [Players.Player.white, Players.Player.black]
-    default_piece_directions = {f"{default_piece_colors[0]}" : 1, f"{default_piece_colors[1]}" : -1} # Down = 1 , Up = 1
+    default_piece_directions = {f"{default_piece_colors[0]}" : 1, f"{default_piece_colors[1]}" : -1}
+    # Down = 1 , Up = 1
     current_player = default_piece_colors[0]
 
     def __init__(self):
@@ -74,7 +75,7 @@ class Chess:
                 return key # Returns pattern name
         return False
 
-    def get_moves(self, piece):
+    def get_pattern_and_moves(self, piece):
         move_able = {}
         if piece.patterns:
             if isinstance(piece.patterns, tuple or list):
@@ -82,7 +83,7 @@ class Chess:
                     move_able[f"{pattern}"] = self.get_pattern_positions(pattern, piece)
             else:
                 move_able[f"{piece.patterns}"] = self.get_pattern_positions(piece.patterns, piece)
-        self.move_able = move_able
+        self.move_able = dict(move_able)
         return self.move_able
 
     def get_pattern_positions(self, pattern, piece):
@@ -104,8 +105,6 @@ class Chess:
         if row >= self.get_board_size() or col >= self.get_board_size():
             return False
         return True
-
-
 
     def movable_position(self, piece, row, col):
         position = self.get_space(row, col)
