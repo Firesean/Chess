@@ -43,10 +43,17 @@ class Interface:
     def calculate_interface_pos(index, spacer, offset): # Returns the position on the interface
         return index * spacer + offset
 
+    def check_enpassant(self):
+        last_move = self.game.get_last_move_made()
+        # Checks for EnPassant
+        if Pattern.EnPassant().get_pattern_name() in last_move.get_pattern_used():
+            self.canvas.delete(last_move.get_captured().get_interface_ref())
+
     def controller(self, event):
         if self.selected:
             self.de_indicate_piece(self.selected)
             if self.selected.get_color() == self.game.get_current_player():
+                # Attempts to move piece based on position on canvas clicked
                 self.move_piece(event)
             else:
                 self.selected = None
@@ -72,7 +79,6 @@ class Interface:
     def display_clear_movable(self):
         for move in self.moves_displayed:
             self.canvas.delete(move)
-
         self.moves_displayed = []
 
     def display_moves(self, piece):
@@ -112,19 +118,21 @@ class Interface:
         self.root.geometry("{0}x{0}".format(self.window_size))
 
         for line in range(board_size):
-
+            #  Rows
             self.canvas.create_line(self.interface_start_pos,
                                     line * spacer,
                                     self.window_size,
                                     line * spacer,
                                     tags=self.board_tag)
 
+            # Columns
             self.canvas.create_line(line * spacer,
                                     self.interface_start_pos,
                                     line * spacer,
                                     self.window_size,
                                     tags=self.board_tag)
 
+        # Border
         self.canvas.create_rectangle(self.interface_start_pos,
                                      self.interface_start_pos,
                                      self.window_size,
@@ -203,6 +211,9 @@ class Interface:
                                                        x-offset,y+offset + offset/self.game.get_board_size())
         self.canvas.move(ref, self.pixels_slided, self.pixels_dropped)
 
+    def interface_adjust_piece(self, row, col):
+        x, y = self.get_xy_with_col_row(col, row)  # Centers the position on the board
+        self.canvas.coords(self.selected.get_interface_ref(), x, y)
 
     def move_indicator(self, event=None):
         size = self.get_offset() / 2
@@ -221,33 +232,25 @@ class Interface:
         if event:
             self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            # Determines if possible Moves # Deselects if none
+            # Determines if possible Moves
+            # Deselects if none
             pattern_name = self.game.get_move_pattern([row, col], self.game.get_move_able()) # If Any positions are possible
             if not pattern_name:
                 self.selected = None
                 return
 
-            # Sets piece position on interface
             if self.movable_position(self.selected, row, col):
                 location = self.game.get_space(row, col)
-                x, y = self.get_xy_with_col_row(col, row) # Centers the position on the board
-                self.canvas.coords(self.selected.get_interface_ref(), x, y)
-
+                self.interface_adjust_piece(row, col)
                 # Deletes piece if captured
                 if location:
                     self.canvas.delete(location.get_interface_ref())
-
-
+                # self.adjust_piece(self.selected) # Will modify to alter pieces that are kept track of if moved
                 self.game.move_piece_on_board(self.selected, pattern_name, row, col, location)
-                last_move = self.game.get_last_move_made()
 
-                # Checks for EnPassant
-                if Pattern.EnPassant().get_pattern_name() in last_move.get_pattern_used():
-                    self.canvas.delete(last_move.get_captured().get_interface_ref())
-
+                self.check_enpassant()
                 self.game.switch_player()
                 self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_player())
-
             self.selected = None
 
     def select_piece(self, event=None):

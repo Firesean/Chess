@@ -116,6 +116,8 @@ class Chess:
 
     def move_piece_on_board(self, piece, pattern_name, row, col, captured=None):
         old_row, old_col = self.get_piece_pos(piece)
+
+        # Temp placed here to adjust pieces
         if piece.get_piece_name() == Pawn().get_piece_name():
             piece.off_bench()
         elif piece.get_piece_name() == King().get_piece_name():
@@ -144,6 +146,7 @@ class Chess:
     def set_pieces(self):
         '''
         Generates the board with new pieces and sets location & color
+        Will adjust to take a temp and place piece for piece
         '''
         for start, end, side, color in [[1, -1, -1, self.default_piece_colors[0]],
                                         [self.board_size-2, self.board_size, 1, self.default_piece_colors[1]]]:

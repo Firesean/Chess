@@ -3,7 +3,7 @@ import MovementPattern as Pattern
 
 class Piece:
     # Unicode for White pieces only.
-    # Transparency on the black pieces only shows outline while white pieces focus on details
+    # Transparency on the black piece unicode only shows outline while white piece unicode focus on details
     pieces = {"Pawn": u"\u265F", "Knight": u"\u265E", "Bishop": u"\u265D",
               "Rook": u"\u265C", "Queen": u"\u265B", "King": u"\u265A"}
 
