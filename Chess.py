@@ -141,34 +141,31 @@ class Chess:
             self.board.append([None])
             self.board[row] *= self.board_size
 
+    def set_board(self, board): # Takes 2D Array with items of Piece Classes to build a board given
+        pass
+
     def set_move_able(self, move_able):
         self.move_able = move_able
 
-    # def set_pieces(self):
-    #     #     '''
-    #     #     Generates the board with new pieces and sets location & color
-    #     #     Will adjust to take a template and place piece for piece
-    #     #     '''
-    #     #     for start, end, side, color in [[1, -1, -1, self.default_piece_colors[0]],
-    #     #                                     [self.board_size-2, self.board_size, 1, self.default_piece_colors[1]]]:
-    #     #         for row in range(start, end, side):
-    #     #             for col in range(self.board_size):
-    #     #                 piece = self.default_board_state[col + 1]
-    #     #                 if row == start:
-    #     #                     piece = self.default_board_state[0]
-    #     #                 new_piece = self.create_piece(piece)
-    #     #                 self.board[row][col] = new_piece
-    #     #                 self.get_space(row, col).set_color(color)
+    def set_piece(self, piece, row, col, color): # Set a piece
+        self.board[row][col] = piece
+        self.get_space(row, col).set_color(color)
+        # Add piece to player's pieces based on color
 
-    def set_pieces(self, p1, p2):
-        for player in [p1, p2]:
-            direction = self.get_default_piece_directions()[player.get_color()]
-            start, end = 0 , self.get_board_size()
-            if direction < 0:
-                start, end = end, start
-            for row in range(start, end, direction):
+    def set_pieces(self): # Set multiple pieces
+        # Default layout
+        '''
+        Generates the board with new pieces and sets location & color
+        Will adjust to take a template and place piece for piece
+        '''
+        for start, end, side, color in [[1, -1, -1, self.default_piece_colors[0]],
+                                        [self.board_size-2, self.board_size, 1, self.default_piece_colors[1]]]:
+            for row in range(start, end, side):
                 for col in range(self.board_size):
-                    pass
+                    piece = self.default_board_state[col + 1]
+                    if row == start:
+                        piece = self.default_board_state[0]
+                    self.set_piece(self.create_piece(piece), row, col, color)
 
     def switch_player(self):
         new_player = self.default_piece_colors.index(self.current_player) - 1
