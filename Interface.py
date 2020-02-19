@@ -1,5 +1,5 @@
-from tkinter import *
-from PIL import Image, ImageTk
+from tkinter import * # User Interface
+from PIL import Image, ImageTk # Image Manipulation
 import MovementPattern as Pattern
 
 
@@ -13,7 +13,7 @@ class Interface:
     indicator_display = None
     interface_start_pos = 2
     movement_tag = "movement" # Used order canvas items
-    pixels_dropped = -15 # Pixels to the bottom
+    pixels_dropped = -12 # Pixels to the bottom
     pixels_slided = 0 # Pixels to the left
     piece_indicator = None
     piece_tag = "piece" # Used order canvas items
@@ -71,12 +71,12 @@ class Interface:
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
 
-    def de_indicate_piece(self, piece):
+    def de_indicate_piece(self, piece): # Adjusts piece back to center of it's square
         ref = piece.get_interface_ref()
         self.canvas.move(ref, -1*self.pixels_slided, -1*self.pixels_dropped)
         self.canvas.delete(self.piece_indicator)
 
-    def display_clear_movable(self):
+    def display_clear_movable(self): # Removes all canvas objects that display moves
         for move in self.moves_displayed:
             self.canvas.delete(move)
         self.moves_displayed = []
@@ -172,7 +172,7 @@ class Interface:
                 x, y = self.get_xy_with_col_row(col, row)
                 color = colors[0]
 
-                if row % 2 == col % 2:
+                if row % 2 == col % 2: # Creates checkered Pattern
                     color = colors[1]
 
                 self.canvas.create_rectangle(x - offset,
@@ -191,6 +191,9 @@ class Interface:
     def get_pattern_and_moves(self, piece):
         return self.game.get_pattern_and_moves(piece)
 
+    def get_movable_position(self, piece, row, col):
+        return self.game.get_movable_position(piece, row, col)
+
     def get_offset(self):
         return int(self.get_spacer() / 2)
 
@@ -204,6 +207,7 @@ class Interface:
         return x, y
 
     def indicate_piece(self, piece):
+        # Adjusts piece to display a small shadow giving effect of piece being raised
         ref = piece.get_interface_ref()
         offset = self.get_offset() / 2
         x, y = self.canvas.coords(ref)
@@ -215,14 +219,11 @@ class Interface:
         x, y = self.get_xy_with_col_row(col, row)  # Centers the position on the board
         self.canvas.coords(self.selected.get_interface_ref(), x, y)
 
-    def move_indicator(self, event=None):
+    def move_indicator(self, event=None): # Indicator that follows the mouse
         size = self.get_offset() / 2
         offset = self.get_offset() / 4
         x_pos, y_pos = event.x + offset, event.y + offset
         self.canvas.coords(self.indicator_display, x_pos, y_pos, x_pos+size, y_pos+size)
-
-    def movable_position(self, piece, row, col):
-        return self.game.movable_position(piece, row, col)
 
     def move_piece(self, event=None):
         '''
@@ -239,7 +240,7 @@ class Interface:
                 self.selected = None
                 return
 
-            if self.movable_position(self.selected, row, col):
+            if self.get_movable_position(self.selected, row, col):
                 location = self.game.get_space(row, col)
                 self.interface_adjust_piece(row, col)
                 # Deletes piece if captured
@@ -257,7 +258,7 @@ class Interface:
         if event:
             x, y = event.x, event.y
             offset = self.get_offset()
-            if x < offset or y < offset:
+            if x < offset or y < offset: # Makes sure you are on the board interface
                 return
             col, row = self.get_col_row_with_xy(x, y)
             self.selected = self.game.get_space(row, col)

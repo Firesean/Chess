@@ -2,6 +2,11 @@ import Pieces
 
 
 class MovementPattern:
+    '''
+    Movement Pattern Class always for a set of methods which the primary use is to calculate positions of
+    the function return_positions for a specified movement pattern
+    A template for the board to determine moves
+    '''
     row_index = 0
     col_index = 1
 
@@ -90,7 +95,8 @@ class Castling(MovementPattern):
     # Else
     # TRUE
     # Next Rook
-    # Your king must not pass through a square that is under attack by enemy pieces;
+    # After Rooks are determined check for Kings possibilities
+    # Your king must not pass through a square that is under attack / threat by enemy pieces;
     # The king must not end up in check.
 
     def return_positions(self, piece, game):

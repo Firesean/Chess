@@ -75,6 +75,15 @@ class Chess:
                 return key # Returns pattern name
         return False
 
+
+    def get_movable_position(self, piece, row, col):
+        position = self.get_space(row, col)
+        if position and piece.get_color() == position.get_color():
+            return False
+        if not self.is_on_board(row, col):
+            return False
+        return True
+
     def get_pattern_and_moves(self, piece):
         move_able = {}
         if piece.patterns:
@@ -103,14 +112,6 @@ class Chess:
         if row < 0 or col < 0:
             return False
         if row >= self.get_board_size() or col >= self.get_board_size():
-            return False
-        return True
-
-    def movable_position(self, piece, row, col):
-        position = self.get_space(row, col)
-        if position and piece.get_color() == position.get_color():
-            return False
-        if not self.is_on_board(row, col):
             return False
         return True
 
@@ -143,21 +144,31 @@ class Chess:
     def set_move_able(self, move_able):
         self.move_able = move_able
 
-    def set_pieces(self):
-        '''
-        Generates the board with new pieces and sets location & color
-        Will adjust to take a temp and place piece for piece
-        '''
-        for start, end, side, color in [[1, -1, -1, self.default_piece_colors[0]],
-                                        [self.board_size-2, self.board_size, 1, self.default_piece_colors[1]]]:
-            for row in range(start, end, side):
+    # def set_pieces(self):
+    #     #     '''
+    #     #     Generates the board with new pieces and sets location & color
+    #     #     Will adjust to take a template and place piece for piece
+    #     #     '''
+    #     #     for start, end, side, color in [[1, -1, -1, self.default_piece_colors[0]],
+    #     #                                     [self.board_size-2, self.board_size, 1, self.default_piece_colors[1]]]:
+    #     #         for row in range(start, end, side):
+    #     #             for col in range(self.board_size):
+    #     #                 piece = self.default_board_state[col + 1]
+    #     #                 if row == start:
+    #     #                     piece = self.default_board_state[0]
+    #     #                 new_piece = self.create_piece(piece)
+    #     #                 self.board[row][col] = new_piece
+    #     #                 self.get_space(row, col).set_color(color)
+
+    def set_pieces(self, p1, p2):
+        for player in [p1, p2]:
+            direction = self.get_default_piece_directions()[player.get_color()]
+            start, end = 0 , self.get_board_size()
+            if direction < 0:
+                start, end = end, start
+            for row in range(start, end, direction):
                 for col in range(self.board_size):
-                    piece = self.default_board_state[col + 1]
-                    if row == start:
-                        piece = self.default_board_state[0]
-                    new_piece = self.create_piece(piece)
-                    self.board[row][col] = new_piece
-                    self.get_space(row, col).set_color(color)
+                    pass
 
     def switch_player(self):
         new_player = self.default_piece_colors.index(self.current_player) - 1

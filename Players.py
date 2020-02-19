@@ -2,9 +2,12 @@ class Player:
     black = "Black"
     white = "White"
 
-    def __init__(self, score=0, color=white, pieces=[]):
+    def __init__(self, color=white, pieces=[]):
         self.color = color
-        self.pieces = []
+        self.pieces = pieces
+
+    def add_piece(self, piece):
+        self.pieces.append(piece)
 
     def get_color(self):
         return self.color
