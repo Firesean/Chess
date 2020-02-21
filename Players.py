@@ -15,4 +15,6 @@ class Player:
     def take_piece(self, piece):
         return self.pieces.remove(piece)
 
+    def get_pieces(self):
+        return self.pieces
 

@@ -9,10 +9,11 @@ class Interface:
     border_size = 0
     canvas = None
     contrast_color = "gray50" # Used for transparency usage
-    moves_displayed = []
     indicator_display = None
     interface_start_pos = 2
+    menu_bar = None
     movement_tag = "movement" # Used order canvas items
+    moves_displayed = []
     pixels_dropped = -12 # Pixels to the bottom
     pixels_slided = 0 # Pixels to the left
     piece_indicator = None
@@ -52,7 +53,7 @@ class Interface:
     def controller(self, event):
         if self.selected:
             self.de_indicate_piece(self.selected)
-            if self.selected.get_color() == self.game.get_current_player():
+            if self.selected.get_color() == self.game.get_current_color():
                 # Attempts to move piece based on position on canvas clicked
                 self.move_piece(event)
             else:
@@ -66,10 +67,36 @@ class Interface:
         self.draw_pieces()
         indicator_size = self.get_offset() / 2
         self.indicator_display = self.canvas.create_rectangle(0,0, indicator_size, indicator_size,
-                                                              fill=self.game.get_current_player())
+                                                              fill=self.game.get_current_color())
         self.root.resizable(width=False, height=False)
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
+        self.create_menu()
+
+    def create_menu(self):
+        self.menu_bar = Menu(self.root)
+
+        background_menu = Menu(self.menu_bar, tearoff=0)
+        for image in []: # Loops through the images/ directory
+            # Filter the image for a name
+            background_menu.add_radiobutton(label=f"{image}")
+
+        display_menu = Menu(self.menu_bar, tearoff=0) # , fg="white", background = "black"
+        display_menu.add_radiobutton(label="Show Moves")
+        display_menu.add_radiobutton(label="Hide Moves")
+
+        players_menu = Menu(self.menu_bar, tearoff=0)
+        players_menu.add_radiobutton(label="Single")
+        players_menu.add_radiobutton(label="Multi-player")
+
+        self.menu_bar.add_cascade(label="Players", menu=players_menu)
+        self.menu_bar.add_cascade(label="Display Moves", menu=display_menu)
+        self.menu_bar.add_command(label="Quit Game", command=lambda: quit())
+
+
+
+        self.root.config(menu=self.menu_bar)
+
 
     def de_indicate_piece(self, piece): # Adjusts piece back to center of it's square
         ref = piece.get_interface_ref()
@@ -251,7 +278,7 @@ class Interface:
 
                 self.check_enpassant()
                 self.game.switch_player()
-                self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_player())
+                self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_color())
             self.selected = None
 
     def select_piece(self, event=None):

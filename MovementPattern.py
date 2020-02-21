@@ -62,7 +62,7 @@ class MovementPattern:
         return True
 
     def is_valid_pawn_move(self, game, pawn, new_row, new_col, pattern):
-        piece_direction = game.get_default_piece_directions()[pawn.get_color()] # Up or Down
+        piece_direction = game.get_piece_directions()[pawn.get_color()] # Up or Down
         y_pos = game.get_piece_pos(pawn)[self.row_index] # Grabs position of piece
         if piece_direction > 0: # Black moving Down
             if y_pos < new_row:
@@ -247,7 +247,7 @@ class Vertical(MovementPattern):
             y_dir = self.get_direction_of(quadrant, self.col_index)
 
             if piece.get_piece_name() == Pieces.Pawn().get_piece_name():
-                piece_direction = game.get_default_piece_directions()[piece.get_color()]
+                piece_direction = game.get_piece_directions()[piece.get_color()]
                 if piece_direction != y_dir:
                     continue
 
