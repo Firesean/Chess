@@ -1,14 +1,17 @@
 from tkinter import * # User Interface
 from PIL import Image, ImageTk # Image Manipulation
 import MovementPattern as Pattern
+import os
 
+CDIRECTORY = os.getcwd() + "\\"
 
 class Interface:
-    background_image = Image.open(r"images/darkWood.png")
+    background_image = Image.open(f"{CDIRECTORY}" + r"images/darkWood.png")
     board_tag = "board_tag" # Used order canvas items
     border_size = 0
     canvas = None
     contrast_color = "gray50" # Used for transparency usage
+    image_object = None
     indicator_display = None
     interface_start_pos = 2
     menu_bar = None
@@ -77,9 +80,11 @@ class Interface:
         self.menu_bar = Menu(self.root)
 
         background_menu = Menu(self.menu_bar, tearoff=0)
-        for image in []: # Loops through the images/ directory
+        for image_path in self.get_background_paths(): # Loops through the images/ directory
             # Filter the image for a name
-            background_menu.add_radiobutton(label=f"{image}")
+            label = self.get_image_name(image_path)
+
+            background_menu.add_radiobutton(label=f"{label}", command=lambda path=image_path: self.set_background(path))
 
         display_menu = Menu(self.menu_bar, tearoff=0) # , fg="white", background = "black"
         display_menu.add_radiobutton(label="Show Moves")
@@ -89,6 +94,7 @@ class Interface:
         players_menu.add_radiobutton(label="Single")
         players_menu.add_radiobutton(label="Multi-player")
 
+        self.menu_bar.add_cascade(label="Backgrounds", menu=background_menu)
         self.menu_bar.add_cascade(label="Players", menu=players_menu)
         self.menu_bar.add_cascade(label="Display Moves", menu=display_menu)
         self.menu_bar.add_command(label="Quit Game", command=lambda: quit())
@@ -139,7 +145,7 @@ class Interface:
         Draws the design structure of the board as a grid and borders and *colors needed parts
         '''
         self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size, bd=self.border_size)
-        self.canvas.create_image(0, 0, anchor=NW, image=self.background_photo)
+        self.image_object = self.canvas.create_image(0, 0, anchor=NW, image=self.background_photo)
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
         self.root.geometry("{0}x{0}".format(self.window_size))
@@ -210,10 +216,29 @@ class Interface:
                                              tags=self.board_tag,
                                              stipple=self.contrast_color)
 
+    @staticmethod
+    def get_background_paths(img_type =".png"):
+        backgrounds = []
+        for image in os.listdir(CDIRECTORY + "images"):
+            if image.endswith(img_type):
+                backgrounds.append(image)
+        return backgrounds
+
     def get_col_row_with_xy(self, x, y):
         spacer = self.get_spacer()
         offset = self.get_offset()
         return self.calculate_board_pos(x, spacer, offset), self.calculate_board_pos(y, spacer, offset)
+
+    @staticmethod
+    def get_image_name(img_path):
+        image = img_path.split(".")[0]  # Grabs everything before File type
+        label = ""
+        for ch in list(image):
+            if ch.isupper():
+                ch = " " + ch
+            label += ch
+        return label[0].upper() + label[1:]
+
 
     def get_pattern_and_moves(self, piece):
         return self.game.get_pattern_and_moves(piece)
@@ -281,6 +306,10 @@ class Interface:
                 self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_color())
             self.selected = None
 
+    @staticmethod
+    def open_image(image_path):
+        return Image.open(f"{CDIRECTORY}"+ "images\\" + image_path)
+
     def select_piece(self, event=None):
         if event:
             x, y = event.x, event.y
@@ -296,6 +325,12 @@ class Interface:
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
         self.root.bind("<Motion>", lambda event: self.move_indicator(event))
+
+    def set_background(self, image_path):
+        self.background_image = self.open_image(image_path)
+        self.background_image = self.background_image.resize((self.window_size, self.window_size), Image.ANTIALIAS)
+        self.background_photo = ImageTk.PhotoImage(self.background_image)
+        self.canvas.itemconfig(self.image_object, image=self.background_photo)
 
 
 
