@@ -173,7 +173,7 @@ class EnPassant(MovementPattern):
         if not last_move.is_default():
             other_piece = last_move.get_piece_used()
             if DoubleJump().get_pattern_name() in last_move.get_pattern_used(): # Is Double jump
-                piece_direction = game.get_default_piece_directions()[piece.get_color()]
+                piece_direction = game.get_piece_directions()[piece.get_color()]
                 if self.is_adjacent(game, piece, other_piece):
                     other_piece_pos = game.get_piece_pos(other_piece)
                     move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])

@@ -7,22 +7,23 @@ CDIRECTORY = os.getcwd() + "\\"
 
 class Interface:
     background_image = Image.open(f"{CDIRECTORY}" + r"images/darkWood.png")
-    board_tag = "board_tag" # Used order canvas items
-    border_size = 0
+    BOARD_TAG = "board_tag" # Used order canvas items
+    BORDER_SIZE = 0
     canvas = None
-    contrast_color = "gray50" # Used for transparency usage
+    CONTRAST_COLOR = "gray50" # Used for transparency usage
     image_object = None
     indicator_display = None
-    interface_start_pos = 2
+    INTERFACE_START_POS = 2
     menu_bar = None
-    movement_tag = "movement" # Used order canvas items
+    MOVEMENT_TAG = "movement" # Used order canvas items
     moves_displayed = []
-    pixels_dropped = -12 # Pixels to the bottom
-    pixels_slided = 0 # Pixels to the left
+    PIXELS_DROPPED = -12 # Pixels to the bottom
+    PIXELS_SLID = 0 # Pixels to the left
     piece_indicator = None
-    piece_tag = "piece" # Used order canvas items
+    PIECE_TAG = "piece" # Used order canvas items
     references = []
     selected = None
+    show_moves = True
 
 
     def __init__(self, game, window_size, root=Tk()):
@@ -80,15 +81,14 @@ class Interface:
         self.menu_bar = Menu(self.root)
 
         background_menu = Menu(self.menu_bar, tearoff=0)
-        for image_path in self.get_background_paths(): # Loops through the images/ directory
+        for image_path in self.get_background_paths(): # Loops through the images
             # Filter the image for a name
             label = self.get_image_name(image_path)
-
             background_menu.add_radiobutton(label=f"{label}", command=lambda path=image_path: self.set_background(path))
 
         display_menu = Menu(self.menu_bar, tearoff=0) # , fg="white", background = "black"
-        display_menu.add_radiobutton(label="Show Moves")
-        display_menu.add_radiobutton(label="Hide Moves")
+        display_menu.add_radiobutton(label="Show Moves", command=lambda : self.set_show_moves(True))
+        display_menu.add_radiobutton(label="Hide Moves", command=lambda : self.set_show_moves(False))
 
         players_menu = Menu(self.menu_bar, tearoff=0)
         players_menu.add_radiobutton(label="Single")
@@ -106,7 +106,7 @@ class Interface:
 
     def de_indicate_piece(self, piece): # Adjusts piece back to center of it's square
         ref = piece.get_interface_ref()
-        self.canvas.move(ref, -1*self.pixels_slided, -1*self.pixels_dropped)
+        self.canvas.move(ref, -1 * self.PIXELS_SLID, -1 * self.PIXELS_DROPPED)
         self.canvas.delete(self.piece_indicator)
 
     def display_clear_movable(self): # Removes all canvas objects that display moves
@@ -124,27 +124,29 @@ class Interface:
         if not move_able: # Empty List
             self.selected = None
             return
-        color = self.game.get_default_movement_color()
-        # color = "cyan"
+
+        if not self.show_moves:
+            return
+        color = self.game.get_movement_color()
         for path in move_able:
             moves = move_able[path]
             for move in moves:
                 row, col = move
                 x, y = self.get_xy_with_col_row(col, row)
                 offset = self.get_offset()
-                self.moves_displayed.append(self.canvas.create_rectangle(x-offset,
-                                                                        y-offset,
-                                                                        x+offset,
-                                                                        y+offset,
-                                                                        fill=color,
-                                                                        stipple=self.contrast_color))
-            self.canvas.lift(self.piece_tag)
+                self.moves_displayed.append(self.canvas.create_rectangle(x - offset,
+                                                                         y - offset,
+                                                                         x + offset,
+                                                                         y + offset,
+                                                                         fill=color,
+                                                                         stipple=self.CONTRAST_COLOR))
+            self.canvas.lift(self.PIECE_TAG)
 
     def draw_board(self):
         '''
         Draws the design structure of the board as a grid and borders and *colors needed parts
         '''
-        self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size, bd=self.border_size)
+        self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size, bd=self.BORDER_SIZE)
         self.image_object = self.canvas.create_image(0, 0, anchor=NW, image=self.background_photo)
         board_size = self.game.get_board_size()
         spacer = self.get_spacer()
@@ -152,25 +154,25 @@ class Interface:
 
         for line in range(board_size):
             #  Rows
-            self.canvas.create_line(self.interface_start_pos,
+            self.canvas.create_line(self.INTERFACE_START_POS,
                                     line * spacer,
                                     self.window_size,
                                     line * spacer,
-                                    tags=self.board_tag)
+                                    tags=self.BOARD_TAG)
 
             # Columns
             self.canvas.create_line(line * spacer,
-                                    self.interface_start_pos,
+                                    self.INTERFACE_START_POS,
                                     line * spacer,
                                     self.window_size,
-                                    tags=self.board_tag)
+                                    tags=self.BOARD_TAG)
 
         # Border
-        self.canvas.create_rectangle(self.interface_start_pos,
-                                     self.interface_start_pos,
+        self.canvas.create_rectangle(self.INTERFACE_START_POS,
+                                     self.INTERFACE_START_POS,
                                      self.window_size,
                                      self.window_size,
-                                     tags=self.board_tag)
+                                     tags=self.BOARD_TAG)
 
         self.canvas.place(relx=0.5, rely=0.5, anchor=CENTER)  # Centers the canvas in Root Window
         self.draw_squares()
@@ -192,14 +194,14 @@ class Interface:
                                                                    self.calculate_interface_pos(row, spacer, offset),
                                                                    text=piece.get_unicode(),
                                                                    font="comicsansms {}".format(offset),
-                                                                   tags=self.piece_tag,
+                                                                   tags=self.PIECE_TAG,
                                                                    fill=piece.get_color()))
                     piece.set_interface_ref(self.references[-1])
 
     def draw_squares(self):
         board_size = self.game.get_board_size()
         offset = self.get_offset()
-        colors = self.game.get_default_board_colors()
+        colors = self.game.get_board_colors()
         for row in range(board_size):
             for col in range(board_size):
                 x, y = self.get_xy_with_col_row(col, row)
@@ -213,14 +215,15 @@ class Interface:
                                              x + offset,
                                              y + offset,
                                              fill=color,
-                                             tags=self.board_tag,
-                                             stipple=self.contrast_color)
+                                             tags=self.BOARD_TAG,
+                                             stipple=self.CONTRAST_COLOR)
 
     @staticmethod
-    def get_background_paths(img_type =".png"):
+    def get_background_paths():
         backgrounds = []
-        for image in os.listdir(CDIRECTORY + "images"):
-            if image.endswith(img_type):
+        for image in sorted(os.listdir(CDIRECTORY + "images")): # Get all files in images and iterate through a sorted list
+            # Checks for legitimate image
+            if not image.endswith(".ico") and [image.endswith(image_type) for image_type in [".tif", ".jpg", ".gif", ".png"]]:
                 backgrounds.append(image)
         return backgrounds
 
@@ -265,7 +268,7 @@ class Interface:
         x, y = self.canvas.coords(ref)
         self.piece_indicator = self.canvas.create_oval(x+offset,y+offset,
                                                        x-offset,y+offset + offset/self.game.get_board_size())
-        self.canvas.move(ref, self.pixels_slided, self.pixels_dropped)
+        self.canvas.move(ref, self.PIXELS_SLID, self.PIXELS_DROPPED)
 
     def interface_adjust_piece(self, row, col):
         x, y = self.get_xy_with_col_row(col, row)  # Centers the position on the board
@@ -331,6 +334,9 @@ class Interface:
         self.background_image = self.background_image.resize((self.window_size, self.window_size), Image.ANTIALIAS)
         self.background_photo = ImageTk.PhotoImage(self.background_image)
         self.canvas.itemconfig(self.image_object, image=self.background_photo)
+
+    def set_show_moves(self, bool):
+        self.show_moves = bool
 
 
 

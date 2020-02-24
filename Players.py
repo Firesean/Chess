@@ -2,7 +2,7 @@ class Player:
     black = "Black"
     white = "White"
 
-    def __init__(self, color=white, pieces=[]):
+    def __init__(self, color, pieces=[]):
         self.color = color
         self.pieces = pieces
 

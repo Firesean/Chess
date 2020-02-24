@@ -4,6 +4,7 @@ import MovementPattern as Pattern
 class Piece:
     # Unicode for White pieces only.
     # Transparency on the black piece unicode only shows outline while white piece unicode focus on details
+    # https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
     pieces = {"Pawn": u"\u265F", "Knight": u"\u265E", "Bishop": u"\u265D",
               "Rook": u"\u265C", "Queen": u"\u265B", "King": u"\u265A"}
 
@@ -56,12 +57,21 @@ class Pawn(Piece):
     '''
     onBench = True
     patterns = Pattern.Diagonal(4, 1), Pattern.Vertical(2, 1), Pattern.DoubleJump(2, 2), Pattern.EnPassant(4,1)
+    rank = 0
 
     def at_bench(self):
         return self.onBench
 
+    def get_rank(self):
+        return self.rank
+
+    def increment_rank(self):
+        self.rank += 1
+
     def off_bench(self):
         self.onBench = False
+
+
 
 
 class Bishop(Piece):

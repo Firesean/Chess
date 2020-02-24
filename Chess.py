@@ -47,10 +47,10 @@ class Chess:
     def get_current_player(self):
         return self.current_player
 
-    def get_default_board_colors(self):
+    def get_board_colors(self):
         return self.board_colors
 
-    def get_default_movement_color(self):
+    def get_movement_color(self):
         return self.movement_color
 
     def get_last_move_made(self):
@@ -118,7 +118,15 @@ class Chess:
 
         # Temp placed here to adjust pieces
         if piece.get_piece_name() == Pawn().get_piece_name():
+            piece.increment_rank()
+            if Pattern.DoubleJump().get_pattern_name() in pattern_name:
+                piece.increment_rank()
+
+
             piece.off_bench()
+            if piece.get_rank() == self.get_board_size() - 2:
+                print("Pawn Promotion")
+
         elif piece.get_piece_name() == King().get_piece_name():
             piece.move_king()
             # If last move as EnPassant
@@ -165,9 +173,6 @@ class Chess:
                         piece = self.default_board_state[0]
                     self.set_piece(self.create_piece(piece), row, col, player.get_color())
                     player.add_piece(piece)
-
-        for player in self.players:
-            print(f"Player - {player.get_color()} : {player.get_pieces()}")
 
     def switch_player(self):
         new_player = self.players.index(self.current_player) - 1
