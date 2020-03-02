@@ -68,6 +68,7 @@ class Interface:
 
     def create_interface(self):
         self.draw_board()
+        self.draw_squares()
         self.draw_pieces()
         indicator_size = self.get_offset() / 2
         self.indicator_display = self.canvas.create_rectangle(0,0, indicator_size, indicator_size,
@@ -175,7 +176,6 @@ class Interface:
                                      tags=self.BOARD_TAG)
 
         self.canvas.place(relx=0.5, rely=0.5, anchor=CENTER)  # Centers the canvas in Root Window
-        self.draw_squares()
         # Place an outline around board
 
     def draw_pieces(self):
@@ -247,7 +247,7 @@ class Interface:
         return self.game.get_pattern_and_moves(piece)
 
     def get_movable_position(self, piece, row, col):
-        return self.game.get_movable_position(piece, row, col)
+        return self.game.is_movable_position(piece, row, col)
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
@@ -335,8 +335,8 @@ class Interface:
         self.background_photo = ImageTk.PhotoImage(self.background_image)
         self.canvas.itemconfig(self.image_object, image=self.background_photo)
 
-    def set_show_moves(self, bool):
-        self.show_moves = bool
+    def set_show_moves(self, boolean):
+        self.show_moves = boolean
 
 
 
