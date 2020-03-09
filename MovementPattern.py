@@ -21,11 +21,6 @@ class MovementPattern:
         # The piece is considered a 0,0 and directions around the piece are determined by input
         # With the quadrant we choose and determine which direction within the quadrant we return based on the axis_direction
         # Either X or Y value within the binary is returned X - 0 Index , Y - 1 Index
-        '''
-        :param quadrant:
-        :param axis:
-        :return: Returns direction as a translated binary, 0 being negative and 1 positive
-        '''
         quadrant = bin(quadrant+1)[-2:].replace("b", "0")  # Returns the last 2 characters of the binary
         # Input = Integer + 1 -> Bin, using the last two characters
         # Examples : 01 10 11 00
@@ -43,13 +38,6 @@ class MovementPattern:
         return type(self).__name__
 
     def is_movable(self, board, piece, new_row, new_col):
-        '''
-        :param board:
-        :param piece:
-        :param new_row:
-        :param new_col:
-        :return: All possible moves as tuples within a list
-        '''
         space = board.get_space(new_row, new_col)
         piece_type = piece.get_piece_name()
         if not board.is_on_board(new_row, new_col):
@@ -86,14 +74,14 @@ class MovementPattern:
 
 class Castling(MovementPattern):
 
-    # Has he moved
+    # Has he moved, The King
     # piece COL
-    # Rook COL - Piece
+    # Rook COL - Piece, positions between
     # Range piece Col+1 Rook COL
     # IF THERE IS A PIECE BETWEEN
-    # RETURN FALSE
+    #   RETURN FALSE
     # Else
-    # TRUE
+    #   TRUE
     # Next Rook
     # After Rooks are determined check for Kings possibilities
     # Your king must not pass through a square that is under attack / threat by enemy pieces;
@@ -128,23 +116,15 @@ class Castling(MovementPattern):
                 print("True")
             else:
                 print("False")
-
-
-        # Check if spaces in between
         # Return king's directions if can move
         return move_able
 
 class Diagonal(MovementPattern):
 
     def return_positions(self, piece, game):
-        '''
-        :param piece:
-        :param game:
-        :return: Possible Movements
-        '''
         move_able = []
         cur_row, cur_col = game.get_piece_pos(piece)
-        # Refer to get_direction_of for understanding of the algorithm below
+        # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
             row_dir, col_dir = self.get_direction_of(quadrant, self.row_index), self.get_direction_of(quadrant, self.col_index)
             for distance in range(1, self.max_distance + 1):
@@ -177,7 +157,6 @@ class EnPassant(MovementPattern):
                 if self.is_adjacent(game, piece, other_piece):
                     other_piece_pos = game.get_piece_pos(other_piece)
                     move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
-
         return move_able
 
     def is_adjacent(self, game, piece, other_piece):
@@ -191,14 +170,9 @@ class EnPassant(MovementPattern):
 class Horizontal(MovementPattern):
 
     def return_positions(self, piece, game):
-        '''
-        :param piece:
-        :param game:
-        :return: Possible Movements
-        '''
         move_able = []
         cur_row, cur_col = game.get_piece_pos(piece)
-        # Refer to get_direction_of for understanding of the algorithm below
+        # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
             row_dir = self.get_direction_of(quadrant, self.row_index)
             for distance in range(1, self.max_distance + 1):
@@ -215,15 +189,10 @@ class Horizontal(MovementPattern):
 class LJump(MovementPattern):
 
     def return_positions(self, piece, game):
-        '''
-        :param piece:
-        :param game:
-        :return: Possible Movements
-        '''
         moves = [(1, self.max_distance),(self.max_distance ,1)]
         move_able = []
         cur_row, cur_col = game.get_piece_pos(piece)
-        # Refer to get_direction_of for understanding of the algorithm below
+        # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
             row_dir, col_dir = self.get_direction_of(quadrant, self.row_index), self.get_direction_of(quadrant, self.col_index)
             for move in moves:
@@ -235,14 +204,9 @@ class LJump(MovementPattern):
 class Vertical(MovementPattern):
 
     def return_positions(self, piece, game):
-        '''
-        :param piece:
-        :param game:
-        :return: Possible Movements
-        '''
         move_able = []
         cur_row, cur_col = game.get_piece_pos(piece)
-        # Refer to get_direction_of for understanding of the algorithm below
+        # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
             y_dir = self.get_direction_of(quadrant, self.col_index)
 

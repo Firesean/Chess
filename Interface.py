@@ -3,24 +3,27 @@ from PIL import Image, ImageTk # Image Manipulation
 import MovementPattern as Pattern
 import os
 
-CDIRECTORY = os.getcwd() + "\\"
+CDIRECTORY = os.getcwd() + "\\"  # Current Directory
 
 class Interface:
-    background_image = Image.open(f"{CDIRECTORY}" + r"images/darkWood.png")
+    # Constants
     BOARD_TAG = "board_tag" # Used order canvas items
     BORDER_SIZE = 0
-    canvas = None
     CONTRAST_COLOR = "gray50" # Used for transparency usage
-    image_object = None
-    indicator_display = None
     INTERFACE_START_POS = 2
-    menu_bar = None
     MOVEMENT_TAG = "movement" # Used order canvas items
-    moves_displayed = []
     PIXELS_DROPPED = -12 # Pixels to the bottom
     PIXELS_SLID = 0 # Pixels to the left
-    piece_indicator = None
     PIECE_TAG = "piece" # Used order canvas items
+
+    # Changeable
+    background_image = Image.open(f"{CDIRECTORY}" + r"images/darkWood.png")
+    canvas = None
+    image_object = None
+    player_indicator_display = None
+    menu_bar = None
+    moves_displayed = []
+    piece_indicator = None
     references = []
     selected = None
     show_moves = True
@@ -50,7 +53,6 @@ class Interface:
 
     def check_enpassant(self):
         last_move = self.game.get_last_move_made()
-        # Checks for EnPassant
         if Pattern.EnPassant().get_pattern_name() in last_move.get_pattern_used():
             self.canvas.delete(last_move.get_captured().get_interface_ref())
 
@@ -71,8 +73,8 @@ class Interface:
         self.draw_squares()
         self.draw_pieces()
         indicator_size = self.get_offset() / 2
-        self.indicator_display = self.canvas.create_rectangle(0,0, indicator_size, indicator_size,
-                                                              fill=self.game.get_current_color())
+        self.player_indicator_display = self.canvas.create_rectangle(0, 0, indicator_size, indicator_size,
+                                                                     fill=self.game.get_current_color())
         self.root.resizable(width=False, height=False)
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
@@ -83,11 +85,10 @@ class Interface:
 
         background_menu = Menu(self.menu_bar, tearoff=0)
         for image_path in self.get_background_paths(): # Loops through the images
-            # Filter the image for a name
             label = self.get_image_name(image_path)
             background_menu.add_radiobutton(label=f"{label}", command=lambda path=image_path: self.set_background(path))
 
-        display_menu = Menu(self.menu_bar, tearoff=0) # , fg="white", background = "black"
+        display_menu = Menu(self.menu_bar, tearoff=0)
         display_menu.add_radiobutton(label="Show Moves", command=lambda : self.set_show_moves(True))
         display_menu.add_radiobutton(label="Hide Moves", command=lambda : self.set_show_moves(False))
 
@@ -100,10 +101,7 @@ class Interface:
         self.menu_bar.add_cascade(label="Display Moves", menu=display_menu)
         self.menu_bar.add_command(label="Quit Game", command=lambda: quit())
 
-
-
         self.root.config(menu=self.menu_bar)
-
 
     def de_indicate_piece(self, piece): # Adjusts piece back to center of it's square
         ref = piece.get_interface_ref()
@@ -116,11 +114,6 @@ class Interface:
         self.moves_displayed = []
 
     def display_moves(self, piece):
-        '''
-        :param piece:
-        Goes through the pieces pattern's to show movable locations
-        Displays the movable locations
-        '''
         move_able = self.get_pattern_and_moves(piece)
         if not move_able: # Empty List
             self.selected = None
@@ -144,9 +137,6 @@ class Interface:
             self.canvas.lift(self.PIECE_TAG)
 
     def draw_board(self):
-        '''
-        Draws the design structure of the board as a grid and borders and *colors needed parts
-        '''
         self.canvas = Canvas(self.root, height=self.window_size, width=self.window_size, bd=self.BORDER_SIZE)
         self.image_object = self.canvas.create_image(0, 0, anchor=NW, image=self.background_photo)
         board_size = self.game.get_board_size()
@@ -176,12 +166,8 @@ class Interface:
                                      tags=self.BOARD_TAG)
 
         self.canvas.place(relx=0.5, rely=0.5, anchor=CENTER)  # Centers the canvas in Root Window
-        # Place an outline around board
 
     def draw_pieces(self):
-        '''
-        Draws pieces onto the board
-        '''
         board = self.game.get_board()
         spacer = self.get_spacer()
         offset = self.get_offset()
@@ -210,10 +196,8 @@ class Interface:
                 if row % 2 == col % 2: # Creates checkered Pattern
                     color = colors[1]
 
-                self.canvas.create_rectangle(x - offset,
-                                             y - offset,
-                                             x + offset,
-                                             y + offset,
+                self.canvas.create_rectangle(x - offset, y - offset,
+                                             x + offset, y + offset,
                                              fill=color,
                                              tags=self.BOARD_TAG,
                                              stipple=self.CONTRAST_COLOR)
@@ -222,7 +206,7 @@ class Interface:
     def get_background_paths():
         backgrounds = []
         for image in sorted(os.listdir(CDIRECTORY + "images")): # Get all files in images and iterate through a sorted list
-            # Checks for legitimate image
+            # Checks for legitimate image and includes images that endwith the specific file types
             if not image.endswith(".ico") and [image.endswith(image_type) for image_type in [".tif", ".jpg", ".gif", ".png"]]:
                 backgrounds.append(image)
         return backgrounds
@@ -234,7 +218,7 @@ class Interface:
 
     @staticmethod
     def get_image_name(img_path):
-        image = img_path.split(".")[0]  # Grabs everything before File type
+        image = img_path.split(".")[0]  # Grabs everything before File type / File Name
         label = ""
         for ch in list(image):
             if ch.isupper():
@@ -242,11 +226,10 @@ class Interface:
             label += ch
         return label[0].upper() + label[1:]
 
-
     def get_pattern_and_moves(self, piece):
         return self.game.get_pattern_and_moves(piece)
 
-    def get_movable_position(self, piece, row, col):
+    def is_movable_position(self, piece, row, col):
         return self.game.is_movable_position(piece, row, col)
 
     def get_offset(self):
@@ -261,8 +244,7 @@ class Interface:
         x, y = self.calculate_interface_pos(col, spacer, offset), self.calculate_interface_pos(row, spacer, offset)
         return x, y
 
-    def indicate_piece(self, piece):
-        # Adjusts piece to display a small shadow giving effect of piece being raised
+    def indicate_piece(self, piece):  # Adjusts piece to display a small shadow giving effect of piece being raised
         ref = piece.get_interface_ref()
         offset = self.get_offset() / 2
         x, y = self.canvas.coords(ref)
@@ -274,28 +256,18 @@ class Interface:
         x, y = self.get_xy_with_col_row(col, row)  # Centers the position on the board
         self.canvas.coords(self.selected.get_interface_ref(), x, y)
 
-    def move_indicator(self, event=None): # Indicator that follows the mouse
+    def player_indicator(self, event=None): # Indicator that follows the mouse
         size = self.get_offset() / 2
         offset = self.get_offset() / 4
         x_pos, y_pos = event.x + offset, event.y + offset
-        self.canvas.coords(self.indicator_display, x_pos, y_pos, x_pos+size, y_pos+size)
+        self.canvas.coords(self.player_indicator_display, x_pos, y_pos, x_pos + size, y_pos + size)
 
     def move_piece(self, event=None):
-        '''
-        :param event:
-        Checks if pieces can move and will move to selected position
-        '''
         if event:
             self.display_clear_movable()
             col, row = self.get_col_row_with_xy(event.x, event.y)
-            # Determines if possible Moves
-            # Deselects if none
             pattern_name = self.game.get_move_pattern([row, col], self.game.get_move_able()) # If Any positions are possible
-            if not pattern_name:
-                self.selected = None
-                return
-
-            if self.get_movable_position(self.selected, row, col):
+            if self.is_movable_position(self.selected, row, col) and pattern_name: # Determines if possible Moves and a piece
                 location = self.game.get_space(row, col)
                 self.interface_adjust_piece(row, col)
                 # Deletes piece if captured
@@ -303,10 +275,8 @@ class Interface:
                     self.canvas.delete(location.get_interface_ref())
                 # self.adjust_piece(self.selected) # Will modify to alter pieces that are kept track of if moved
                 self.game.move_piece_on_board(self.selected, pattern_name, row, col, location)
-
                 self.check_enpassant()
-                self.game.switch_player()
-                self.canvas.itemconfigure(self.indicator_display, fill=self.game.get_current_color())
+                self.switch_player()
             self.selected = None
 
     @staticmethod
@@ -327,7 +297,7 @@ class Interface:
 
     def set_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
-        self.root.bind("<Motion>", lambda event: self.move_indicator(event))
+        self.root.bind("<Motion>", lambda event: self.player_indicator(event))
 
     def set_background(self, image_path):
         self.background_image = self.open_image(image_path)
@@ -338,6 +308,9 @@ class Interface:
     def set_show_moves(self, boolean):
         self.show_moves = boolean
 
+    def switch_player(self):
+        self.game.switch_player()
+        self.canvas.itemconfigure(self.player_indicator_display, fill=self.game.get_current_color())
 
 
 

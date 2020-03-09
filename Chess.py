@@ -2,8 +2,6 @@ import Players
 from Pieces import *
 from PreviousMove import *
 from PlayerManager import *
-# https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
-
 
 class Chess:
     board_size = 8
@@ -37,8 +35,6 @@ class Chess:
 
     def append_to_moves_made(self, piece, pattern_name, row, col, old_row, old_col, captured=None):
         self.moves_made.append(PreviousMove(piece, pattern_name, old_row, old_col, row, col, captured))
-    # Grab the pieces patterns and determine which pattern was used
-    # Save it along with the distance taken to new position
 
     @staticmethod
     def create_piece(piece_name): # Takes a piece_name and creates a piece
@@ -106,7 +102,6 @@ class Chess:
             return self.board[row][col]
         return None
 
-
     def is_movable_position(self, piece, row, col):
         position = self.get_space(row, col)
         if position and piece.get_color() == position.get_color():
@@ -157,17 +152,11 @@ class Chess:
     def set_move_able(self, move_able):
         self.move_able = move_able
 
-    def set_piece(self, piece, row, col, color): # Set a piece
+    def set_piece(self, piece, row, col, color):
         self.board[row][col] = piece
         self.get_space(row, col).set_color(color)
-        # Add piece to player's pieces based on color
 
-    def set_start_pieces(self): # Set multiple pieces
-        # Default layout
-        '''
-        Generates the board with new pieces and sets location & color
-        Will adjust to take a template and place piece for piece
-        '''
+    def set_start_pieces(self):
         for start, end, side, player in [[1, -1, -1, self.players[0]],
                                         [self.board_size-2, self.board_size, 1, self.players[1]]]:
             for row in range(start, end, side):

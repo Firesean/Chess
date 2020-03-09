@@ -21,16 +21,9 @@ class Piece:
         return self.color
 
     def get_unicode(self):
-        '''
-        :return: Unicode Image
-        '''
         return self.pieces[self.get_piece_name()]
 
     def get_unicode_mapping(self):
-        '''
-        :return: Dictionary Key for unicode
-        Using the color and pieceType class name
-        '''
         return self.color + " " + self.get_piece_name()
 
     def get_interface_ref(self):

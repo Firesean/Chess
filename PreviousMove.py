@@ -1,7 +1,7 @@
 class PreviousMove:
     '''
-    This class will later be used to move backwards through the game if needed if testing purposes or beginner's usage against AI
-    Agent.
+    This class will later be used to move backwards through the game
+    if needed for testing purposes or beginner usage against AI Agent.
     '''
 
     def __init__(self, piece=None, pattern_name="", old_row=0, old_col=0, new_row=0, new_col=0, captured=None):
