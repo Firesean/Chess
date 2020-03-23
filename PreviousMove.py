@@ -5,37 +5,37 @@ class PreviousMove:
     '''
 
     def __init__(self, piece=None, pattern_name="", old_row=0, old_col=0, new_row=0, new_col=0, captured=None):
-        self.captured = captured
-        self.new_col = new_col
-        self.new_row = new_row
-        self.old_col = old_col
-        self.old_row = old_row
-        self.pattern_name = pattern_name
-        self.piece = piece
+        self.CAPTURED = captured
+        self.NEW_COL = new_col
+        self.NEW_ROW = new_row
+        self.OLD_COL = old_col
+        self.OLD_ROW = old_row
+        self.PATTERN_NAME = pattern_name
+        self.PIECE = piece
 
     def display_all(self):
         print(f'''
-        Captured : {self.captured}
-        New Row : {self.new_row}
-        New Col : {self.new_col}
-        Old Row : {self.old_row}
-        Old Col : {self.old_col}
-        Pattern : {self.pattern_name}
-        Piece : {self.piece}
+        Captured : {self.CAPTURED}
+        New Row : {self.NEW_ROW}
+        New Col : {self.NEW_COL}
+        Old Row : {self.OLD_ROW}
+        Old Col : {self.OLD_COL}
+        Pattern : {self.PATTERN_NAME}
+        Piece : {self.PIECE}
         ''')
 
     def get_captured(self):
-        return self.captured
+        return self.CAPTURED
 
     def get_pattern_used(self):
-        if self.pattern_name:
-            return self.pattern_name
+        if self.PATTERN_NAME:
+            return self.PATTERN_NAME
 
     def get_piece_used(self):
-        return self.piece
+        return self.PIECE
 
     def is_default(self):
-        if [self.old_row, self.old_col] == [self.new_row, self.new_col]:
+        if [self.OLD_ROW, self.OLD_COL] == [self.NEW_ROW, self.NEW_COL]:
             return True
         return False
 
