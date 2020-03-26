@@ -83,6 +83,12 @@ class Chess:
                 return key # Returns pattern name
         return False
 
+    def get_next_color(self):
+        return self.get_next_player().get_color()
+
+    def get_next_player(self):
+        return self.PLAYERS[self.PLAYERS.index(self.current_player) - 1]
+
     def get_pattern_and_moves(self, piece):
         move_able = {}
         if piece.patterns:
@@ -170,3 +176,5 @@ class Chess:
     def switch_player(self):
         new_player = self.PLAYERS.index(self.current_player) - 1
         self.current_player = self.PLAYERS[new_player]
+
+

@@ -41,7 +41,7 @@ class Interface:
         self.background_image = self.background_image.resize((self.window_size, self.window_size), Image.ANTIALIAS)
         self.background_photo = ImageTk.PhotoImage(self.background_image)
         self.create_interface()
-        self.set_binds()
+        self.enable_binds()
         self.root.mainloop()
 
     @staticmethod
@@ -63,7 +63,6 @@ class Interface:
         if piece.get_piece_name() == Piece.Pawn().get_piece_name():
             if piece.get_rank() == self.game.get_board_size() - 2:
                 self.draw_pawn_promotion()
-                # Display Pieces to promote into
                 # Switch Controllers -- Singleton for enabling controllers and disable other
                 # Grab input on piece chosen
                 # Change piece
@@ -184,24 +183,24 @@ class Interface:
         sq_2 = spacer * 2
         sq_3 = spacer * 3
         colors = self.game.get_board_colors()
+        outline_color = "black"
         half_window = self.window_size / 2
-        a = self.canvas.create_polygon(half_window - sq_2, half_window - sq_2,
+        # Design window
+        self.references.append(self.canvas.create_polygon(half_window - sq_2, half_window - sq_2,
                                    half_window + sq_3, half_window - sq_2,
                                    half_window + sq_2, half_window + sq_2,
                                    half_window - sq_3, half_window + sq_2,
-                                   fill=colors[0], outline="black",
-                                   width=3)
+                                   fill=colors[0], outline=outline_color,
+                                   width=3, stipple=self.CONTRAST_COLOR))
 
-        b = self.canvas.create_polygon(half_window - sq_2 + offset, half_window - sq_2 + offset,
+        self.references.append(self.canvas.create_polygon(half_window - sq_2 + offset, half_window - sq_2 + offset,
                                    half_window + sq_3 - offset, half_window - sq_2 + offset,
                                    half_window + sq_2 - offset, half_window + sq_2 - offset,
                                    half_window - sq_3 + offset, half_window + sq_2 - offset,
-                                   fill=colors[1], outline="black",
-                                   width=3)
-        [self.references.append(item) for item in (a,b)]
-        print(True)
-
-
+                                   fill=colors[1], outline=outline_color,
+                                   width=3))
+        # Draw Pieces
+        self.draw_promotion_pieces(spacer, offset)
 
     def draw_pieces(self):
         board = self.game.get_board()
@@ -219,6 +218,20 @@ class Interface:
                                                                    tags=self.PIECE_TAG,
                                                                    fill=piece.get_color()))
                     piece.set_interface_ref(self.references[-1])
+
+    def draw_promotion_pieces(self, spacer, offset):
+        _pieces = ["Knight", "Bishop", "Rook", "Queen"]
+        for piece in _pieces:
+            index = _pieces.index(piece)
+            row = int(self.game.get_board_size() / 2 - 1) + int(index / 2)
+            col = int(self.game.get_board_size() / 2 - 1) +  index % 2
+            print(row, col)
+            self.references.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
+                                                           self.calculate_interface_pos(row, spacer, offset),
+                                                           text=Piece.Piece.pieces[piece],
+                                                           font="comicsansms {}".format(offset),
+                                                           tags=self.PIECE_TAG,
+                                                           fill=self.game.get_current_color()))
 
     def draw_squares(self):
         board_size = self.game.get_board_size()
@@ -330,9 +343,12 @@ class Interface:
                 self.display_moves(self.selected)
                 self.indicate_piece(self.selected)
 
-    def set_binds(self):
+    def enable_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
         self.root.bind("<Motion>", lambda event: self.player_indicator(event))
+
+    def disable_binds(self):
+        self.root.unbind_all(ALL)
 
     def set_background(self, image_path):
         self.background_image = self.open_image(image_path)

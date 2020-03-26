@@ -130,6 +130,7 @@ class Diagonal(MovementPattern):
             for distance in range(1, self.max_distance + 1):
                 new_row, new_col = cur_row + distance * col_dir, cur_col + distance * row_dir
                 if self.is_movable(game, piece, new_row, new_col):
+                    # Will King be threaten
                     if piece.get_piece_name() == Pieces.Pawn().get_piece_name():
                         if not self.is_valid_pawn_move(game, piece, new_row, new_col, self):
                             break
@@ -155,6 +156,7 @@ class EnPassant(MovementPattern):
             if DoubleJump().get_pattern_name() in last_move.get_pattern_used(): # Is Double jump
                 piece_direction = game.get_piece_directions()[piece.get_color()]
                 if self.is_adjacent(game, piece, other_piece):
+                    # Will King be threaten
                     other_piece_pos = game.get_piece_pos(other_piece)
                     move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
         return move_able
@@ -178,6 +180,7 @@ class Horizontal(MovementPattern):
             for distance in range(1, self.max_distance + 1):
                 new_col = cur_col + distance * row_dir
                 if self.is_movable(game, piece, cur_row, new_col):
+                    # Will King be threaten
                     move_able.append([cur_row, new_col])
                     if game.get_space(*move_able[-1]):
                         break
@@ -198,6 +201,7 @@ class LJump(MovementPattern):
             for move in moves:
                 new_row, new_col = cur_row + move[0] * col_dir, cur_col + move[1] * row_dir
                 if self.is_movable(game, piece, new_row, new_col):
+                    # Will King be threaten
                     move_able.append([new_row, new_col])
         return move_able
 
@@ -222,6 +226,7 @@ class Vertical(MovementPattern):
             for distance in range(1, self.max_distance + 1):
                 new_row = cur_row + distance * y_dir
                 if self.is_movable(game, piece, new_row, cur_col):
+                    # Will King be threaten
                     move_able.append([new_row, cur_col])
                     if game.get_space(*move_able[-1]):
                         break
