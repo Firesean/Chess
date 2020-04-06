@@ -7,8 +7,8 @@ class MovementPattern:
     the function return_positions for a specified movement pattern
     A template for the board to determine moves
     '''
-    row_index = 0
-    col_index = 1
+    ROW_INDEX = 0
+    COL_INDEX = 1
 
 
     def __init__(self, quadrant_corners=2, max_distance=7):
@@ -51,7 +51,7 @@ class MovementPattern:
 
     def is_valid_pawn_move(self, game, pawn, new_row, new_col, pattern):
         piece_direction = game.get_piece_directions()[pawn.get_color()] # Up or Down
-        y_pos = game.get_piece_pos(pawn)[self.row_index] # Grabs position of piece
+        y_pos = game.get_piece_pos(pawn)[self.ROW_INDEX] # Grabs position of piece
         if piece_direction > 0: # Black moving Down
             if y_pos < new_row:
                 return self.validate_pawn_move(game, pawn, new_row, new_col, pattern)
@@ -95,7 +95,7 @@ class Castling(MovementPattern):
         piece_pos = game.get_piece_pos(piece)
         # Col : 0 Index and Board Size - 1 Index for Rooks
         for col in [0, game.get_board_size() - 1]:
-            other_piece = game.get_space(piece_pos[self.row_index], col)
+            other_piece = game.get_space(piece_pos[self.ROW_INDEX], col)
             if other_piece and other_piece.get_piece_name() == Pieces.Rook().get_piece_name():
                 # Has rook moved and check for matching colors
                 rooks.append(other_piece)
@@ -104,7 +104,7 @@ class Castling(MovementPattern):
             spaces_between = []
             for pattern in rook_patterns:
                 for move in rook_patterns[pattern]:
-                    if move[self.row_index] == piece_pos[self.row_index]:
+                    if move[self.ROW_INDEX] == piece_pos[self.ROW_INDEX]:
                         spaces_between.append(move)
                 for move in spaces_between:
                     if move: # Check if move would be through check
@@ -112,7 +112,7 @@ class Castling(MovementPattern):
                 else: # Not through check
                     pass
 
-            if len(spaces_between) + 1 == abs(piece_pos[self.col_index] - game.get_piece_pos(rook)[self.col_index]):
+            if len(spaces_between) + 1 == abs(piece_pos[self.COL_INDEX] - game.get_piece_pos(rook)[self.COL_INDEX]):
                 print("True")
             else:
                 print("False")
@@ -126,7 +126,7 @@ class Diagonal(MovementPattern):
         cur_row, cur_col = game.get_piece_pos(piece)
         # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
-            row_dir, col_dir = self.get_direction_of(quadrant, self.row_index), self.get_direction_of(quadrant, self.col_index)
+            row_dir, col_dir = self.get_direction_of(quadrant, self.ROW_INDEX), self.get_direction_of(quadrant, self.COL_INDEX)
             for distance in range(1, self.max_distance + 1):
                 new_row, new_col = cur_row + distance * col_dir, cur_col + distance * row_dir
                 if self.is_movable(game, piece, new_row, new_col):
@@ -158,14 +158,14 @@ class EnPassant(MovementPattern):
                 if self.is_adjacent(game, piece, other_piece):
                     # Will King be threaten
                     other_piece_pos = game.get_piece_pos(other_piece)
-                    move_able.append([other_piece_pos[self.row_index]+piece_direction , other_piece_pos[self.col_index]])
+                    move_able.append([other_piece_pos[self.ROW_INDEX] + piece_direction , other_piece_pos[self.COL_INDEX]])
         return move_able
 
     def is_adjacent(self, game, piece, other_piece):
         piece_pos = game.get_piece_pos(piece)
         other_pos = game.get_piece_pos(other_piece)
-        if piece_pos[self.row_index] == other_pos[self.row_index]:
-            if abs(piece_pos[self.col_index] - other_pos[self.col_index]) == 1:
+        if piece_pos[self.ROW_INDEX] == other_pos[self.ROW_INDEX]:
+            if abs(piece_pos[self.COL_INDEX] - other_pos[self.COL_INDEX]) == 1:
                 return True
         return False
 
@@ -176,7 +176,7 @@ class Horizontal(MovementPattern):
         cur_row, cur_col = game.get_piece_pos(piece)
         # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
-            row_dir = self.get_direction_of(quadrant, self.row_index)
+            row_dir = self.get_direction_of(quadrant, self.ROW_INDEX)
             for distance in range(1, self.max_distance + 1):
                 new_col = cur_col + distance * row_dir
                 if self.is_movable(game, piece, cur_row, new_col):
@@ -197,7 +197,7 @@ class LJump(MovementPattern):
         cur_row, cur_col = game.get_piece_pos(piece)
         # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
-            row_dir, col_dir = self.get_direction_of(quadrant, self.row_index), self.get_direction_of(quadrant, self.col_index)
+            row_dir, col_dir = self.get_direction_of(quadrant, self.ROW_INDEX), self.get_direction_of(quadrant, self.COL_INDEX)
             for move in moves:
                 new_row, new_col = cur_row + move[0] * col_dir, cur_col + move[1] * row_dir
                 if self.is_movable(game, piece, new_row, new_col):
@@ -212,7 +212,7 @@ class Vertical(MovementPattern):
         cur_row, cur_col = game.get_piece_pos(piece)
         # Refer to get_direction_of for understanding of the code statement below
         for quadrant in range(self.quadrant_corners):
-            y_dir = self.get_direction_of(quadrant, self.col_index)
+            y_dir = self.get_direction_of(quadrant, self.COL_INDEX)
 
             if piece.get_piece_name() == Pieces.Pawn().get_piece_name():
                 piece_direction = game.get_piece_directions()[piece.get_color()]

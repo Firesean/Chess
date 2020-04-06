@@ -5,4 +5,4 @@
 import Chess as Chs
 import Interface as Ui
 
-game = Ui.Interface(Chs.Chess(), 800)
+game = Ui.Interface(Chs.Chess(), 650)

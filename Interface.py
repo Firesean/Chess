@@ -11,20 +11,23 @@ class Interface:
     BOARD_TAG = "board_tag" # Used order canvas items
     BORDER_SIZE = 0
     CONTRAST_COLOR = "gray50" # Used for transparency usage
+    FONT_PATTERN = "comicsansms {}"
     INTERFACE_START_POS = 2
     MOVEMENT_TAG = "movement" # Used order canvas items
     PIXELS_DROPPED = -12 # Pixels to the bottom
     PIXELS_SLID = 0 # Pixels to the left
     PIECE_TAG = "piece" # Used order canvas items
+    PROMOTIONS = ["Knight", "Bishop", "Rook", "Queen"]
 
     # Changeable
     background_image = Image.open(f"{CDIRECTORY}" + r"images/darkWood.png")
     canvas = None
     image_object = None
-    player_indicator_display = None
+    is_pawn_promotion = False
     menu_bar = None
     moves_displayed = []
     piece_indicator = None
+    player_indicator_display = None
     references = []
     selected = None
     show_moves = True
@@ -63,18 +66,39 @@ class Interface:
         if piece.get_piece_name() == Piece.Pawn().get_piece_name():
             if piece.get_rank() == self.game.get_board_size() - 2:
                 self.draw_pawn_promotion()
-                # Switch Controllers -- Singleton for enabling controllers and disable other
-                # Grab input on piece chosen
+                self.is_pawn_promotion = True
                 # Change piece
-                # Switch Controllers -- Singleton for enabling controllers and disable other
+
+    def choose_promotion(self, event):
+        col, row = self.get_col_row_with_xy(event.x, event.y)
+        start_point = int(self.game.get_board_size() / 2 - 1)
+        end_point = start_point + 1
+        if (col, row).count(start_point) + (col, row).count(end_point) == 2:
+            col -= start_point
+            row -= start_point
+            index = end_point-(row * 2 + col)
+            piece = self.game.create_piece(self.PROMOTIONS[-index])
+            row, col = self.game.get_piece_pos(self.selected)
+            self.canvas.delete(self.selected.get_interface_ref())
+            self.game.set_piece(piece, row, col, self.selected.get_color())
+            for count in range(6):
+                self.canvas.delete(self.references.pop())
+            self.draw_piece(row, col, piece)
+        else:
+            return
+        self.selected = None
+        self.is_pawn_promotion = False
 
     def controller(self, event):
-        if self.selected:
+        if self.is_pawn_promotion:
+            self.choose_promotion(event)
+        elif self.selected:
             self.display_clear_movable()
             self.de_indicate_piece(self.selected)
             if self.selected.get_color() == self.game.get_current_color():
                 self.move_piece(event)
-            self.selected = None
+            if not self.is_pawn_promotion:
+                self.selected = None
         else:
             self.select_piece(event)
 
@@ -202,34 +226,34 @@ class Interface:
         # Draw Pieces
         self.draw_promotion_pieces(spacer, offset)
 
-    def draw_pieces(self):
-        board = self.game.get_board()
+    def draw_piece(self, row, col, piece):
         spacer = self.get_spacer()
         offset = self.get_offset()
+        self.references.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
+                                                       self.calculate_interface_pos(row, spacer, offset),
+                                                       text=piece.get_unicode(),
+                                                       font=self.FONT_PATTERN.format(offset),
+                                                       tags=self.PIECE_TAG,
+                                                       fill=piece.get_color()))
+        piece.set_interface_ref(self.references[-1])
+
+    def draw_pieces(self):
+        board = self.game.get_board()
         for row in board:
             for piece in row:
-
                 if piece:
                     row, col = self.game.get_piece_pos(piece)
-                    self.references.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
-                                                                   self.calculate_interface_pos(row, spacer, offset),
-                                                                   text=piece.get_unicode(),
-                                                                   font="comicsansms {}".format(offset),
-                                                                   tags=self.PIECE_TAG,
-                                                                   fill=piece.get_color()))
-                    piece.set_interface_ref(self.references[-1])
+                    self.draw_piece(row, col, piece)
 
     def draw_promotion_pieces(self, spacer, offset):
-        _pieces = ["Knight", "Bishop", "Rook", "Queen"]
-        for piece in _pieces:
-            index = _pieces.index(piece)
+        for piece in self.PROMOTIONS:
+            index = self.PROMOTIONS.index(piece)
             row = int(self.game.get_board_size() / 2 - 1) + int(index / 2)
             col = int(self.game.get_board_size() / 2 - 1) +  index % 2
-            print(row, col)
             self.references.append(self.canvas.create_text(self.calculate_interface_pos(col, spacer, offset),
                                                            self.calculate_interface_pos(row, spacer, offset),
                                                            text=Piece.Piece.pieces[piece],
-                                                           font="comicsansms {}".format(offset),
+                                                           font=self.FONT_PATTERN.format(offset),
                                                            tags=self.PIECE_TAG,
                                                            fill=self.game.get_current_color()))
 
@@ -241,7 +265,6 @@ class Interface:
             for col in range(board_size):
                 x, y = self.get_xy_with_col_row(col, row)
                 color = colors[0]
-
                 if row % 2 == col % 2: # Creates checkered Pattern
                     color = colors[1]
 
@@ -250,6 +273,12 @@ class Interface:
                                              fill=color,
                                              tags=self.BOARD_TAG,
                                              stipple=self.CONTRAST_COLOR)
+
+    def enable_binds(self):
+        self.root.bind("<Button-1>", lambda event: self.controller(event))
+        self.root.bind("<Motion>", lambda event: self.player_indicator(event))
+
+
 
     @staticmethod
     def get_background_paths():
@@ -325,7 +354,6 @@ class Interface:
                 self.check_pawn_promotion()
                 self.check_enpassant()
                 self.switch_player()
-            self.selected = None
 
     @staticmethod
     def open_image(image_path):
@@ -342,13 +370,6 @@ class Interface:
             if self.selected:
                 self.display_moves(self.selected)
                 self.indicate_piece(self.selected)
-
-    def enable_binds(self):
-        self.root.bind("<Button-1>", lambda event: self.controller(event))
-        self.root.bind("<Motion>", lambda event: self.player_indicator(event))
-
-    def disable_binds(self):
-        self.root.unbind_all(ALL)
 
     def set_background(self, image_path):
         self.background_image = self.open_image(image_path)
