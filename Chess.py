@@ -38,8 +38,6 @@ class Chess:
         if Pattern.DoubleJump().get_pattern_name() in pattern_name:
             piece.increment_rank()
         piece.off_bench()
-        if piece.get_rank() == self.get_board_size() - 2:
-            print("Pawn Promotion")
 
     def append_to_moves_made(self, piece, pattern_name, row, col, old_row, old_col, captured=None):
         self.moves_made.append(PreviousMove(piece, pattern_name, old_row, old_col, row, col, captured))

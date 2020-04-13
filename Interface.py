@@ -74,14 +74,14 @@ class Interface:
         start_point = int(self.game.get_board_size() / 2 - 1)
         end_point = start_point + 1
         if (col, row).count(start_point) + (col, row).count(end_point) == 2:
-            col -= start_point
-            row -= start_point
-            index = end_point-(row * 2 + col)
+            col -= start_point  # 1 or 0
+            row -= start_point  # 1 or 0
+            index = end_point - (row * 2 + col)
             piece = self.game.create_piece(self.PROMOTIONS[-index])
             row, col = self.game.get_piece_pos(self.selected)
             self.canvas.delete(self.selected.get_interface_ref())
             self.game.set_piece(piece, row, col, self.selected.get_color())
-            for count in range(6):
+            for count in range(6):  # 6 is items added for canvas object
                 self.canvas.delete(self.references.pop())
             self.draw_piece(row, col, piece)
         else:
