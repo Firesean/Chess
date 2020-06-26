@@ -12,15 +12,15 @@ class Chess:
                                                 Knight().get_piece_name(), Rook().get_piece_name()])
     MOVEMENT_COLOR = "firebrick3"
 
-    def __init__(self, players=[Players.Player("White"), Players.Player("Black")]):
+    def __init__(self, pm=PlayerManager([Players.Player("White", []), Players.Player("Black", [])])):
         # Declarations
         self.board = []
         self.moves_made = []
-        self.PLAYER_MANAGER = None
-        self.PLAYERS = players
-        self.PIECE_DIRECTIONS = {f"{players[0].get_color()}": 1, f"{players[1].get_color()}": -1}
+        self.PM = pm # Player Manager
+        self.PLAYERS = pm.get_players()
+        self.PIECE_DIRECTIONS = {f"{self.PLAYERS[0].get_color()}": 1, f"{self.PLAYERS[1].get_color()}": -1}
         # Downwards is 1 and Upwards is -1
-        self.current_player = players[0]
+        self.current_player = self.PLAYERS[0]
         # Main
         self.move_able = {}
         self.new_board()
@@ -33,7 +33,8 @@ class Chess:
             moves = self.get_pattern_and_moves(piece)
         return moves
 
-    def alter_pawn(self, piece, pattern_name):
+    @staticmethod
+    def alter_pawn(piece, pattern_name):
         piece.increment_rank()
         if Pattern.DoubleJump().get_pattern_name() in pattern_name:
             piece.increment_rank()
@@ -42,9 +43,19 @@ class Chess:
     def append_to_moves_made(self, piece, pattern_name, row, col, old_row, old_col, captured=None):
         self.moves_made.append(PreviousMove(piece, pattern_name, old_row, old_col, row, col, captured))
 
+
+    def check_pawn_promotion(self):
+        last_move = self.get_last_move_made()
+        piece = last_move.get_piece_used()
+        if piece.get_piece_name() == Pawn().get_piece_name():
+            if piece.get_rank() == self.get_board_size() - 2:
+                return True
+        return False
+
     @staticmethod
     def create_piece(piece_name): # Takes a piece_name and creates a piece
         return eval(f'{piece_name}()')
+
 
     def get_board(self):
         return self.board
@@ -55,9 +66,6 @@ class Chess:
     def get_current_color(self):
         return self.current_player.get_color()
 
-    def get_current_player(self):
-        return self.current_player
-
     def get_board_colors(self):
         return self.BOARD_COLORS
 
@@ -65,7 +73,7 @@ class Chess:
         return self.MOVEMENT_COLOR
 
     def get_last_move_made(self):
-        if len(self.moves_made) != 0:
+        if self.moves_made:
             return self.moves_made[-1]
         return PreviousMove()
 
@@ -80,12 +88,6 @@ class Chess:
             else:
                 return key # Returns pattern name
         return False
-
-    def get_next_color(self):
-        return self.get_next_player().get_color()
-
-    def get_next_player(self):
-        return self.PLAYERS[self.PLAYERS.index(self.current_player) - 1]
 
     def get_pattern_and_moves(self, piece):
         move_able = {}
@@ -169,10 +171,4 @@ class Chess:
                     if row == start:
                         piece = self.START_BOARD[0]
                     self.set_piece(self.create_piece(piece), row, col, player.get_color())
-                    player.add_piece(piece)
-
-    def switch_player(self):
-        new_player = self.PLAYERS.index(self.current_player) - 1
-        self.current_player = self.PLAYERS[new_player]
-
-
+                    player.add_piece(self.get_space(row, col))

@@ -1,10 +1,9 @@
 from tkinter import * # User Interface
-from PIL import Image, ImageTk # Image Manipulation
+from PIL import ImageTk # Image Manipulation
 import MovementPattern as Pattern
 import Pieces as Piece
-import os
-
-CDIRECTORY = os.getcwd() + "\\"  # Current Directory
+from ImageManager import *
+from ImageManager import ImageManager as IM
 
 class Interface:
     # Constants
@@ -55,19 +54,23 @@ class Interface:
     def calculate_interface_pos(index, spacer, offset=0): # Returns the position on the interface
         return index * spacer + offset
 
+    def check(self, event):
+        if event:
+            opp = self.game.PM.get_next_player()
+            pieces_opp = opp.get_pieces()
+            user = self.game.PM.get_current_player()
+            pieces_user = user.get_pieces()
+            user_king = [p for p in pieces_user if p.get_piece_name() == Piece.King().get_piece_name() and p.get_color() == user.get_color()]
+            print(user_king)
+            print(user.get_color())
+            print(pieces_user)
+            print(opp.get_color())
+            print(pieces_opp)
+
     def check_enpassant(self):
         last_move = self.game.get_last_move_made()
         if Pattern.EnPassant().get_pattern_name() in last_move.get_pattern_used():
             self.canvas.delete(last_move.get_captured().get_interface_ref())
-
-    def check_pawn_promotion(self):
-        last_move = self.game.get_last_move_made()
-        piece = last_move.get_piece_used()
-        if piece.get_piece_name() == Piece.Pawn().get_piece_name():
-            if piece.get_rank() == self.game.get_board_size() - 2:
-                self.draw_pawn_promotion()
-                self.is_pawn_promotion = True
-                # Change piece
 
     def choose_promotion(self, event):
         col, row = self.get_col_row_with_xy(event.x, event.y)
@@ -95,7 +98,7 @@ class Interface:
         elif self.selected:
             self.display_clear_movable()
             self.de_indicate_piece(self.selected)
-            if self.selected.get_color() == self.game.get_current_color():
+            if self.selected.get_color() == self.game.PM.get_current_color():
                 self.move_piece(event)
             if not self.is_pawn_promotion:
                 self.selected = None
@@ -108,7 +111,7 @@ class Interface:
         self.draw_pieces()
         indicator_size = self.get_offset() / 2
         self.player_indicator_display = self.canvas.create_rectangle(0, 0, indicator_size, indicator_size,
-                                                                     fill=self.game.get_current_color())
+                                                                     fill=self.game.PM.get_current_color())
         self.root.resizable(width=False, height=False)
         self.root.title(type(self.game).__name__)
         self.root.iconbitmap(self.icon_ref)
@@ -118,8 +121,8 @@ class Interface:
         self.menu_bar = Menu(self.root)
 
         background_menu = Menu(self.menu_bar, tearoff=0)
-        for image_path in self.get_background_paths(): # Loops through the image paths
-            label = self.get_image_name(image_path)
+        for image_path in IM.get_background_paths(): # Loops through the image paths
+            label = IM.get_image_name(image_path)
             background_menu.add_radiobutton(label=f"{label}", command=lambda path=image_path: self.set_background(path))
 
         display_menu = Menu(self.menu_bar, tearoff=0)
@@ -162,10 +165,8 @@ class Interface:
                 row, col = move
                 x, y = self.get_xy_with_col_row(col, row)
                 offset = self.get_offset()
-                self.moves_displayed.append(self.canvas.create_rectangle(x - offset,
-                                                                         y - offset,
-                                                                         x + offset,
-                                                                         y + offset,
+                self.moves_displayed.append(self.canvas.create_rectangle(x - offset, y - offset,
+                                                                         x + offset, y + offset,
                                                                          fill=color,
                                                                          stipple=self.CONTRAST_COLOR))
             self.canvas.lift(self.PIECE_TAG)
@@ -179,24 +180,18 @@ class Interface:
 
         for line in range(board_size):
             #  Rows
-            self.canvas.create_line(self.INTERFACE_START_POS,
-                                    line * spacer,
-                                    self.window_size,
-                                    line * spacer,
+            self.canvas.create_line(self.INTERFACE_START_POS, line * spacer,
+                                    self.window_size, line * spacer,
                                     tags=self.BOARD_TAG)
 
             # Columns
-            self.canvas.create_line(line * spacer,
-                                    self.INTERFACE_START_POS,
-                                    line * spacer,
-                                    self.window_size,
+            self.canvas.create_line(line * spacer, self.INTERFACE_START_POS,
+                                    line * spacer, self.window_size,
                                     tags=self.BOARD_TAG)
 
         # Border
-        self.canvas.create_rectangle(self.INTERFACE_START_POS,
-                                     self.INTERFACE_START_POS,
-                                     self.window_size,
-                                     self.window_size,
+        self.canvas.create_rectangle(self.INTERFACE_START_POS, self.INTERFACE_START_POS,
+                                     self.window_size, self.window_size,
                                      tags=self.BOARD_TAG)
 
         self.canvas.place(relx=0.5, rely=0.5, anchor=CENTER)  # Centers the canvas in Root Window
@@ -215,7 +210,7 @@ class Interface:
                                    half_window + sq_2, half_window + sq_2,
                                    half_window - sq_3, half_window + sq_2,
                                    fill=colors[0], outline=outline_color,
-                                   width=3, stipple=self.CONTRAST_COLOR))
+                                   width=3, stipple=self.CONTRAST_COLOR)) # Stipple is used for transparency
 
         self.references.append(self.canvas.create_polygon(half_window - sq_2 + offset, half_window - sq_2 + offset,
                                    half_window + sq_3 - offset, half_window - sq_2 + offset,
@@ -255,7 +250,7 @@ class Interface:
                                                            text=Piece.Piece.pieces[piece],
                                                            font=self.FONT_PATTERN.format(offset),
                                                            tags=self.PIECE_TAG,
-                                                           fill=self.game.get_current_color()))
+                                                           fill=self.game.PM.get_current_color()))
 
     def draw_squares(self):
         board_size = self.game.get_board_size()
@@ -272,46 +267,24 @@ class Interface:
                                              x + offset, y + offset,
                                              fill=color,
                                              tags=self.BOARD_TAG,
-                                             stipple=self.CONTRAST_COLOR)
+                                             stipple=self.CONTRAST_COLOR) # Stipple is used for transparency
 
     def enable_binds(self):
         self.root.bind("<Button-1>", lambda event: self.controller(event))
         self.root.bind("<Motion>", lambda event: self.player_indicator(event))
-
-
-
-    @staticmethod
-    def get_background_paths():
-        backgrounds = []
-        for image in sorted(os.listdir(CDIRECTORY + "images")): # Get all files in images and iterate through a sorted list
-            # Checks for legitimate image and includes images that end with the specific file types
-            if not image.endswith(".ico") and [image.endswith(image_type) for image_type in [".tif", ".jpg", ".gif", ".png"]]:
-                backgrounds.append(image)
-        return backgrounds
+        self.root.bind("<a>", lambda event: self.check(event))
 
     def get_col_row_with_xy(self, x, y):
         spacer = self.get_spacer()
         offset = self.get_offset()
         return self.calculate_board_pos(x, spacer, offset), self.calculate_board_pos(y, spacer, offset)
 
-    @staticmethod
-    def get_image_name(img_path):
-        image = img_path.split(".")[0]  # Grabs everything before File type / File Name
-        label = ""
-        for ch in list(image):
-            if ch.isupper():
-                ch = " " + ch
-            label += ch
-        return label[0].upper() + label[1:]
-
-    def get_pattern_and_moves(self, piece):
-        return self.game.get_pattern_and_moves(piece)
-
-    def is_movable_position(self, piece, row, col):
-        return self.game.is_movable_position(piece, row, col)
 
     def get_offset(self):
         return int(self.get_spacer() / 2)
+
+    def get_pattern_and_moves(self, piece):
+        return self.game.get_pattern_and_moves(piece)
 
     def get_spacer(self):
         return int(self.window_size / self.game.get_board_size())
@@ -334,11 +307,8 @@ class Interface:
         x, y = self.get_xy_with_col_row(col, row)  # Centers the position on the board
         self.canvas.coords(self.selected.get_interface_ref(), x, y)
 
-    def player_indicator(self, event=None): # Indicator that follows the mouse
-        size = self.get_offset() / 2
-        offset = self.get_offset() / 4
-        x_pos, y_pos = event.x + offset, event.y + offset
-        self.canvas.coords(self.player_indicator_display, x_pos, y_pos, x_pos + size, y_pos + size)
+    def is_movable_position(self, piece, row, col):
+        return self.game.is_movable_position(piece, row, col)
 
     def move_piece(self, event=None):
         if event:
@@ -351,13 +321,18 @@ class Interface:
                 if location:
                     self.canvas.delete(location.get_interface_ref())
                 self.game.move_piece_on_board(self.selected, pattern_name, row, col, location)
-                self.check_pawn_promotion()
-                self.check_enpassant()
-                self.switch_player()
+                if self.game.check_pawn_promotion():
+                    self.draw_pawn_promotion()
+                    self.is_pawn_promotion = True
+                self.check_enpassant() # Removes pawn's canvas object that got enpassant
+                self.game.PM.switch_current_player() # Switch player in game
+                self.switch_player() # Switch player indicator
 
-    @staticmethod
-    def open_image(image_path):
-        return Image.open(f"{CDIRECTORY}"+ "images\\" + image_path)
+    def player_indicator(self, event=None): # Indicator that follows the mouse
+        size = self.get_offset() / 2
+        offset = self.get_offset() / 4
+        x_pos, y_pos = event.x + offset, event.y + offset
+        self.canvas.coords(self.player_indicator_display, x_pos, y_pos, x_pos + size, y_pos + size)
 
     def select_piece(self, event=None):
         if event:
@@ -372,7 +347,7 @@ class Interface:
                 self.indicate_piece(self.selected)
 
     def set_background(self, image_path):
-        self.background_image = self.open_image(image_path)
+        self.background_image = IM.open_image(image_path)
         self.background_image = self.background_image.resize((self.window_size, self.window_size), Image.ANTIALIAS)
         self.background_photo = ImageTk.PhotoImage(self.background_image)
         self.canvas.itemconfig(self.image_object, image=self.background_photo)
@@ -381,8 +356,4 @@ class Interface:
         self.show_moves = boolean
 
     def switch_player(self):
-        self.game.switch_player()
-        self.canvas.itemconfigure(self.player_indicator_display, fill=self.game.get_current_color())
-
-
-
+        self.canvas.itemconfigure(self.player_indicator_display, fill=self.game.PM.get_current_color())
