@@ -61,11 +61,22 @@ class Interface:
             user = self.game.PM.get_current_player()
             pieces_user = user.get_pieces()
             user_king = [p for p in pieces_user if p.get_piece_name() == Piece.King().get_piece_name() and p.get_color() == user.get_color()]
-            print(user_king)
-            print(user.get_color())
-            print(pieces_user)
-            print(opp.get_color())
-            print(pieces_opp)
+            king_location = self.game.get_piece_pos(*user_king)
+            movable = []
+            for p in pieces_opp:
+                try:
+                    for pat in p.patterns:
+                        movable += pat.return_positions(p, self.game)
+                except TypeError:
+                    try:
+                        movable += p.patterns.return_positions(p, self.game)
+                    except AttributeError as e:
+                        print(e)
+
+            movable = sorted(list(set(map(tuple, movable))))
+            print(movable)
+            print(king_location)
+            print(king_location in movable)
 
     def check_enpassant(self):
         last_move = self.game.get_last_move_made()
