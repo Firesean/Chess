@@ -11,8 +11,8 @@ The game is played through running Main.py with the library Pillow and Tkinter i
 - Players is not functional as of yet.
 - Quit game is as stated. Quit the game upon clicked on.
 
-<img src="https://user-images.githubusercontent.com/46581862/77124285-ac820300-69ff-11ea-92af-645fd0bcd066.JPG" width="400" height="400">
-<img src="C:\Users\Owner\PycharmProjects\Chess\chessMoves.JPG" width="400" height="400">
+<img src="https://user-images.githubusercontent.com/46581862/90093352-3e0c4d00-dce0-11ea-9743-cd6e0298556f.jpg" width="400" height="400">
+<img src="https://user-images.githubusercontent.com/46581862/90093351-3d73b680-dce0-11ea-94c0-7abfba2ce473.JPG" width="400" height="400">
 
 
 
