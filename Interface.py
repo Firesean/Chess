@@ -74,9 +74,9 @@ class Interface:
                         print(e)
 
             movable = sorted(list(set(map(tuple, movable))))
-            print(movable)
-            print(king_location)
-            print(king_location in movable)
+            print("Movable Spaces : " ,movable)
+            print("King's Location : ", king_location)
+            print("King Location is Movable : ", king_location in movable)
 
     def check_enpassant(self):
         last_move = self.game.get_last_move_made()
